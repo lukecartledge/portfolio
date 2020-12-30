@@ -1,4 +1,4 @@
-# lukecartledge_portfolio
+# portfolio
 
 ## Project setup
 ```
