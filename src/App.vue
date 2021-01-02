@@ -4,6 +4,7 @@
 </template>
 
 <script>
+import 'buefy/dist/buefy.css'
 import HelloWorld from './components/HelloWorld.vue'
 
 export default {
