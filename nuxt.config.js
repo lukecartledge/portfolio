@@ -22,15 +22,9 @@ export default {
 
   components: true,
 
-  buildModules: [
-    '@nuxtjs/eslint-module',
-  ],
+  buildModules: ['@nuxtjs/eslint-module'],
 
-  modules: [
-    'nuxt-buefy',
-    '@nuxtjs/axios',
-    '@nuxt/content',
-  ],
+  modules: ['nuxt-buefy', '@nuxtjs/axios', '@nuxt/content'],
 
   axios: {
     baseURL: '/',
