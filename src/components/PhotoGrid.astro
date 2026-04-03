@@ -32,12 +32,12 @@ const { photos, columns = 2 } = Astro.props;
 <style>
   .photo-grid {
     display: grid;
-    gap: var(--space-3);
+    gap: var(--space-4);
   }
 
   @media (min-width: 768px) {
     .photo-grid {
-      gap: var(--space-4);
+      gap: var(--space-6);
     }
 
     .photo-grid.cols-2 {
@@ -55,7 +55,7 @@ const { photos, columns = 2 } = Astro.props;
 
   @media (min-width: 1024px) {
     .photo-grid {
-      gap: var(--space-6);
+      gap: var(--space-8);
     }
 
     .photo-grid.cols-4 {
