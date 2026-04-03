@@ -1,0 +1,93 @@
+---
+import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
+import { urlFor, gridSrcset } from '@/lib/image';
+
+interface Props {
+  image: SanityImageSource;
+  title: string;
+  location?: string;
+  href?: string;
+  loading?: 'lazy' | 'eager';
+}
+
+const { image, title, location, href, loading = 'lazy' } = Astro.props;
+
+const src = urlFor(image).width(600).height(400).fit('crop').quality(75).auto('format').url();
+const srcset = gridSrcset(image);
+---
+
+<figure class="photo-card">
+  {href ? (
+    <a href={href} class="photo-link">
+      <img
+        src={src}
+        srcset={srcset}
+        sizes="(min-width: 768px) 50vw, 100vw"
+        alt={title}
+        width="600"
+        height="400"
+        loading={loading}
+        decoding="async"
+      />
+      {location && <figcaption class="photo-location">{location}</figcaption>}
+    </a>
+  ) : (
+    <>
+      <img
+        src={src}
+        srcset={srcset}
+        sizes="(min-width: 768px) 50vw, 100vw"
+        alt={title}
+        width="600"
+        height="400"
+        loading={loading}
+        decoding="async"
+      />
+      {location && <figcaption class="photo-location">{location}</figcaption>}
+    </>
+  )}
+</figure>
+
+<style>
+  .photo-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .photo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-normal) var(--ease-out);
+  }
+
+  .photo-card:hover img {
+    transform: scale(1.02);
+  }
+
+  .photo-link {
+    display: block;
+    text-decoration: none;
+  }
+
+  .photo-link:hover {
+    opacity: 1;
+  }
+
+  .photo-location {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--space-3) var(--space-4);
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+    color: var(--color-bg);
+    font-size: var(--text-sm);
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--ease-out);
+  }
+
+  .photo-card:hover .photo-location {
+    opacity: 1;
+  }
+</style>

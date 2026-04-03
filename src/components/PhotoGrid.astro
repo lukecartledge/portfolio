@@ -1,0 +1,65 @@
+---
+import PhotoCard from '@/components/PhotoCard.astro';
+import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
+
+type Photo = {
+  image: SanityImageSource;
+  title: string;
+  location?: string;
+  slug?: string;
+};
+
+interface Props {
+  photos: Photo[];
+  columns?: 2 | 3 | 4;
+}
+
+const { photos, columns = 2 } = Astro.props;
+---
+
+<div class:list={['photo-grid', `cols-${columns}`]}>
+  {photos.map((photo, index) => (
+    <PhotoCard
+      image={photo.image}
+      title={photo.title}
+      location={photo.location}
+      href={photo.slug ? `/photo/${photo.slug}` : undefined}
+      loading={index < 4 ? 'eager' : 'lazy'}
+    />
+  ))}
+</div>
+
+<style>
+  .photo-grid {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 768px) {
+    .photo-grid {
+      gap: var(--space-4);
+    }
+
+    .photo-grid.cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .photo-grid.cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .photo-grid.cols-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .photo-grid {
+      gap: var(--space-6);
+    }
+
+    .photo-grid.cols-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>
