@@ -96,6 +96,8 @@ h6 {
   --space-16: 4rem;
   --space-24: 6rem;
   --space-32: 8rem;
+  --space-40: 10rem;
+  --space-48: 12rem;
 
   /* Layout */
   --max-content: 1200px;
