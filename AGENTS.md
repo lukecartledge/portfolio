@@ -2,7 +2,7 @@
 
 ## Overview
 
-Photography portfolio for lukecartledge.com. Astro v5 (SSG) + Sanity CMS + Cloudflare Pages.
+Photography portfolio for lukecartledge.com. Astro v6 (SSG) + Sanity CMS v5 + Cloudflare Pages.
 
 ## Build & Dev
 
@@ -10,15 +10,23 @@ Photography portfolio for lukecartledge.com. Astro v5 (SSG) + Sanity CMS + Cloud
 npm run dev       # Local dev server
 npm run build     # Production build (output: dist/)
 npm run preview   # Preview production build
+
+# Sanity Studio (from sanity/ directory)
+cd sanity && npm run dev     # Studio dev server
+cd sanity && npx sanity build  # Build Studio
 ```
 
 ## Stack
 
-- **Framework**: Astro v5, static output
-- **CMS**: Sanity (client in `src/lib/sanity.ts`, image helpers in `src/lib/image.ts`)
+- **Framework**: Astro v6, static output
+- **CMS**: Sanity (project `c42ibxe8`, dataset `production` — public, no token needed)
+  - Client: `src/lib/sanity.ts`
+  - Image helpers: `src/lib/image.ts`
+  - Content loader: `src/content.config.ts` (custom Astro v5+ loader)
+  - Studio: `sanity/` directory (deploys to lukecartledge.sanity.studio)
 - **Hosting**: Cloudflare Pages (`wrangler.toml`)
 - **Styling**: Vanilla CSS with custom properties. No Tailwind, no CSS-in-JS.
-- **Fonts**: Playfair Display (headings), Inter (body) — self-hosted in `public/fonts/`
+- **Fonts**: Playfair Display (headings), Satoshi variable (body) — self-hosted in `public/fonts/`
 
 ## Conventions
 
@@ -27,24 +35,38 @@ npm run preview   # Preview production build
 - **Design tokens**: All spacing, colors, typography use CSS custom properties from `src/styles/global.css`.
 - **Images**: All photography served from Sanity CDN with `auto=format` (WebP/AVIF). Use helpers in `src/lib/image.ts`.
 - **Atomic commits**: Each commit does one thing. Build passes before and after. Message has no "and".
+- **Content collections**: Astro content config at `src/content.config.ts` with custom Sanity loader. Uses `@sanity/client` directly (no `sanityLoader` — it doesn't exist).
 
 ## File Structure
 
 ```
-src/
-├── components/     # Reusable .astro components
-├── layouts/        # Page layouts (Base, Page)
-├── lib/            # Sanity client, image helpers
-├── pages/          # Route pages
-└── styles/         # global.css, utilities.css
+├── sanity/
+│   ├── schemaTypes/    # siteConfig, photo, collection, page
+│   ├── sanity.config.ts
+│   └── sanity.cli.ts
+├── src/
+│   ├── components/     # Reusable .astro components
+│   ├── content.config.ts  # Astro content collections
+│   ├── layouts/        # Page layouts (Base, Page)
+│   ├── lib/            # Sanity client, image helpers
+│   ├── pages/          # Route pages
+│   └── styles/         # global.css, utilities.css
 ```
+
+## Sanity
+
+- **Project ID**: `c42ibxe8`
+- **Dataset**: `production` (public — no API token needed for reads)
+- **API Version**: `2024-01-01`
+- **Studio**: Deploys separately to `lukecartledge.sanity.studio`
+- **Schema types**: siteConfig (singleton), photo, collection, page
 
 ## Environment Variables
 
+Dataset is public. No `.env` file required.
+
 ```
-SANITY_PROJECT_ID   # Sanity project ID
-SANITY_DATASET      # Sanity dataset (default: production)
-SANITY_API_TOKEN    # Sanity API token (optional for public datasets)
+SANITY_API_TOKEN    # Only needed if dataset is changed to private
 ```
 
 ## Do Not
@@ -54,3 +76,5 @@ SANITY_API_TOKEN    # Sanity API token (optional for public datasets)
 - Suppress TypeScript errors with `as any` or `@ts-ignore`
 - Modify font files or design tokens without checking the plan
 - Commit `.env` files
+- Use `sanityLoader` (it does not exist in @sanity/astro)
+- Add `react()` integration (Studio deploys separately)
