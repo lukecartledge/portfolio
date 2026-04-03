@@ -1,92 +1,73 @@
 ---
+import { getCollection } from 'astro:content';
 import Page from '@/layouts/Page.astro';
+import PhotoHero from '@/components/PhotoHero.astro';
+import PhotoGrid from '@/components/PhotoGrid.astro';
 import SocialLinks from '@/components/SocialLinks.astro';
+import { PortableText } from 'astro-portabletext';
+import { ogImageUrl } from '@/lib/image';
 
-const socialLinks = [
-  { platform: 'instagram' as const, url: 'https://instagram.com/lukecartledge', label: 'Instagram' },
-  { platform: 'email' as const, url: 'mailto:hello@lukecartledge.com', label: 'Email' },
-  { platform: 'github' as const, url: 'https://github.com/lukecartledge', label: 'GitHub' },
-];
+const siteConfigEntries = await getCollection('siteConfig');
+const config = siteConfigEntries[0]?.data;
+
+if (!config) {
+  throw new Error('siteConfig not found in Sanity. Ensure at least one siteConfig document exists.');
+}
+
+const heroPhoto = config.featuredPhotos?.[0];
+const gridPhotos = config.featuredPhotos?.slice(1) ?? [];
+
+const socialLinks = (config.socialLinks ?? []).map((link: { platform: string; url: string }) => {
+  const labels: Record<string, string> = {
+    instagram: 'Instagram',
+    github: 'GitHub',
+    email: 'Email',
+  };
+  return {
+    platform: link.platform as 'instagram' | 'github' | 'email',
+    url: link.url,
+    label: labels[link.platform] ?? link.platform,
+  };
+});
+
+const title = config.seo?.metaTitle ?? `${config.title} — ${config.tagline}`;
+const description = config.seo?.metaDescription ?? config.tagline;
+const ogImage = heroPhoto?.image ? ogImageUrl(heroPhoto.image) : undefined;
 ---
 
-<Page title="Luke Cartledge — Photography">
-  <section class="hero-placeholder">
-    <div class="hero-inner">
-      <p class="hero-label">Landscape &amp; Travel Photography</p>
-    </div>
-  </section>
+<Page title={title} description={description} ogImage={ogImage}>
+  {heroPhoto && (
+    <PhotoHero image={heroPhoto.image} alt={heroPhoto.title} overlay>
+      <p class="hero-label">{config.tagline}</p>
+    </PhotoHero>
+  )}
 
   <section class="bio container prose">
-    <p>
-      Photographer based in Switzerland, drawn to remote landscapes and the quiet
-      moments between light and land. Currently building this site — photos coming soon.
-    </p>
-    <div class="bio-social">
-      <SocialLinks links={socialLinks} />
-    </div>
+    {config.bio && <PortableText value={config.bio} />}
+    {socialLinks.length > 0 && (
+      <div class="bio-social">
+        <SocialLinks links={socialLinks} />
+      </div>
+    )}
   </section>
 
-  <section class="featured container">
-    <h2 class="section-heading">Featured Work</h2>
-    <div class="placeholder-grid">
-      <div class="placeholder-card" />
-      <div class="placeholder-card" />
-      <div class="placeholder-card" />
-      <div class="placeholder-card" />
-    </div>
-  </section>
+  {gridPhotos.length > 0 && (
+    <section class="featured container">
+      <h2 class="section-heading">Featured Work</h2>
+      <PhotoGrid photos={gridPhotos.map((p: { image: unknown; title: string; location?: string; slug?: { current: string } }) => ({
+        image: p.image,
+        title: p.title,
+        location: p.location,
+        slug: p.slug?.current,
+      }))} />
+    </section>
+  )}
 </Page>
 
 <style>
-  .hero-placeholder {
-    width: 100vw;
-    margin-inline: calc(50% - 50vw);
-    height: 50vh;
-    background-color: var(--color-bg-alt);
-    display: flex;
-    align-items: flex-end;
-    padding-bottom: var(--space-8);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero-placeholder::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    opacity: 0.03;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 256px 256px;
-  }
-
-  @media (min-width: 768px) {
-    .hero-placeholder {
-      height: 60vh;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .hero-placeholder {
-      height: 70vh;
-    }
-  }
-
-  .hero-inner {
-    text-align: left;
-    padding-inline: var(--space-4);
-  }
-
-  @media (min-width: 768px) {
-    .hero-inner {
-      padding-inline: var(--space-8);
-    }
-  }
-
   .hero-label {
     font-size: var(--text-sm);
-    color: var(--color-text-muted);
+    color: var(--color-bg);
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
@@ -109,10 +90,14 @@ const socialLinks = [
     }
   }
 
-  .bio p {
+  .bio :global(p) {
     font-size: var(--text-lg);
     line-height: var(--leading-relaxed);
     color: var(--color-text);
+  }
+
+  .bio :global(p + p) {
+    margin-top: var(--space-4);
   }
 
   .bio-social {
@@ -140,52 +125,5 @@ const socialLinks = [
   .section-heading {
     margin-bottom: var(--space-12);
     font-size: var(--text-xl);
-  }
-
-  .placeholder-grid {
-    display: grid;
-    gap: var(--space-4);
-  }
-
-  @media (min-width: 768px) {
-    .placeholder-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-8);
-    }
-  }
-
-  .placeholder-card {
-    aspect-ratio: 3 / 2;
-    background-color: var(--color-bg-alt);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-    transition:
-      box-shadow var(--duration-normal) var(--ease-editorial),
-      transform var(--duration-normal) var(--ease-editorial);
-  }
-
-  .placeholder-card:hover {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-  }
-
-  /* --- Scroll-driven reveal for cards (progressive enhancement) --- */
-
-  @supports (animation-timeline: view()) {
-    @keyframes fade-up-in {
-      from {
-        opacity: 0;
-        transform: translateY(2rem);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .placeholder-card {
-      animation: fade-up-in var(--ease-editorial) both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 40%;
-    }
   }
 </style>
