@@ -1,0 +1,42 @@
+---
+---
+
+<header class="header">
+  <div class="container header-inner">
+    <a href="/" class="site-name">Luke Cartledge</a>
+    <p class="site-tagline">Photography</p>
+  </div>
+</header>
+
+<style>
+  .header {
+    padding-block: var(--space-8);
+  }
+
+  .header-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .site-name {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    line-height: var(--leading-tight);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .site-name:hover {
+    opacity: 1;
+  }
+
+  .site-tagline {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+</style>
