@@ -155,11 +155,11 @@ a {
   color: var(--color-accent);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
-  transition: opacity var(--duration-fast) var(--ease-out);
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
 a:hover {
-  opacity: 0.7;
+  color: var(--color-text-muted);
 }
 
 img {

@@ -145,6 +145,14 @@ const socialLinks = [
     aspect-ratio: 3 / 2;
     background-color: var(--color-bg-alt);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    transition:
+      box-shadow var(--duration-normal) var(--ease-editorial),
+      transform var(--duration-normal) var(--ease-editorial);
+  }
+
+  .placeholder-card:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
   }
 
   /* --- Scroll-driven reveal for cards (progressive enhancement) --- */
