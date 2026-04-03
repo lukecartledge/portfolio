@@ -1,0 +1,29 @@
+---
+import Page from '@/layouts/Page.astro';
+---
+
+<Page title="Page Not Found — Luke Cartledge">
+  <section class="not-found container">
+    <h1>404</h1>
+    <p>This page doesn't exist.</p>
+    <a href="/">Back to home</a>
+  </section>
+</Page>
+
+<style>
+  .not-found {
+    padding-block: var(--space-32);
+    text-align: center;
+  }
+
+  .not-found h1 {
+    font-size: var(--text-4xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .not-found p {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-8);
+  }
+</style>

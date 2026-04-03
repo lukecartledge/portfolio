@@ -1,9 +1,118 @@
 ---
 import Page from '@/layouts/Page.astro';
+import SocialLinks from '@/components/SocialLinks.astro';
+
+const socialLinks = [
+  { platform: 'instagram' as const, url: 'https://instagram.com/lukecartledge', label: 'Instagram' },
+  { platform: 'email' as const, url: 'mailto:hello@lukecartledge.com', label: 'Email' },
+  { platform: 'github' as const, url: 'https://github.com/lukecartledge', label: 'GitHub' },
+];
 ---
 
 <Page title="Luke Cartledge — Photography">
-  <section class="hero">
-    <p>Coming soon</p>
+  <section class="hero-placeholder">
+    <div class="hero-inner">
+      <p class="hero-label">Landscape &amp; Travel Photography</p>
+    </div>
+  </section>
+
+  <section class="bio container prose">
+    <p>
+      Photographer based in Switzerland, drawn to remote landscapes and the quiet
+      moments between light and land. Currently building this site — photos coming soon.
+    </p>
+    <div class="bio-social">
+      <SocialLinks links={socialLinks} />
+    </div>
+  </section>
+
+  <section class="featured container">
+    <h2 class="section-heading">Featured Work</h2>
+    <div class="placeholder-grid">
+      <div class="placeholder-card" />
+      <div class="placeholder-card" />
+      <div class="placeholder-card" />
+      <div class="placeholder-card" />
+    </div>
   </section>
 </Page>
+
+<style>
+  .hero-placeholder {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    height: 50vh;
+    background-color: var(--color-bg-alt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (min-width: 768px) {
+    .hero-placeholder {
+      height: 60vh;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero-placeholder {
+      height: 70vh;
+    }
+  }
+
+  .hero-inner {
+    text-align: center;
+  }
+
+  .hero-label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .bio {
+    padding-block: var(--space-24);
+    text-align: center;
+  }
+
+  .bio p {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .bio-social {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-8);
+  }
+
+  .featured {
+    padding-block: var(--space-16) var(--space-24);
+  }
+
+  .section-heading {
+    text-align: center;
+    margin-bottom: var(--space-12);
+    font-size: var(--text-xl);
+  }
+
+  .placeholder-grid {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 768px) {
+    .placeholder-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-6);
+    }
+  }
+
+  .placeholder-card {
+    aspect-ratio: 3 / 2;
+    background-color: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+  }
+</style>
