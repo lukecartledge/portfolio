@@ -12,9 +12,16 @@ node_modules/
 # astro
 .astro/
 
+# sanity
+sanity/.sanity/
+sanity/dist/
+
 # cloudflare
 .wrangler/
 .dev.vars
+
+# opencode
+.opencode/
 
 # editor
 .vscode/
