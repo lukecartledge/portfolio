@@ -30,11 +30,11 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site)
 <meta name="twitter:description" content={description} />
 {ogImage && <meta name="twitter:image" content={ogImage} />}
 
+<link rel="preload" href="/fonts/Raleway-Latin.woff2" as="font" type="font/woff2" crossorigin />
 <link
   rel="preload"
-  href="/fonts/PlayfairDisplay-Bold.woff2"
+  href="/fonts/Poppins-Regular-Latin.woff2"
   as="font"
   type="font/woff2"
   crossorigin
 />
-<link rel="preload" href="/fonts/Satoshi-Variable.woff2" as="font" type="font/woff2" crossorigin />
