@@ -1,51 +1,53 @@
 ---
-import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
-import { urlFor, gridSrcset } from '@/lib/image';
+import type { SanityImageSource } from '@sanity/image-url'
+import { urlFor, gridSrcset } from '@/lib/image'
 
 interface Props {
-  image: SanityImageSource;
-  title: string;
-  location?: string;
-  href?: string;
-  loading?: 'lazy' | 'eager';
+  image: SanityImageSource
+  title: string
+  location?: string
+  href?: string
+  loading?: 'lazy' | 'eager'
 }
 
-const { image, title, location, href, loading = 'lazy' } = Astro.props;
+const { image, title, location, href, loading = 'lazy' } = Astro.props
 
-const src = urlFor(image).width(600).height(400).fit('crop').quality(75).auto('format').url();
-const srcset = gridSrcset(image);
+const src = urlFor(image).width(600).height(400).fit('crop').quality(75).auto('format').url()
+const srcset = gridSrcset(image)
 ---
 
 <figure class="photo-card">
-  {href ? (
-    <a href={href} class="photo-link">
-      <img
-        src={src}
-        srcset={srcset}
-        sizes="(min-width: 768px) 50vw, 100vw"
-        alt={title}
-        width="600"
-        height="400"
-        loading={loading}
-        decoding="async"
-      />
-      {location && <figcaption class="photo-location">{location}</figcaption>}
-    </a>
-  ) : (
-    <>
-      <img
-        src={src}
-        srcset={srcset}
-        sizes="(min-width: 768px) 50vw, 100vw"
-        alt={title}
-        width="600"
-        height="400"
-        loading={loading}
-        decoding="async"
-      />
-      {location && <figcaption class="photo-location">{location}</figcaption>}
-    </>
-  )}
+  {
+    href ? (
+      <a href={href} class="photo-link">
+        <img
+          src={src}
+          srcset={srcset}
+          sizes="(min-width: 768px) 50vw, 100vw"
+          alt={title}
+          width="600"
+          height="400"
+          loading={loading}
+          decoding="async"
+        />
+        {location && <figcaption class="photo-location">{location}</figcaption>}
+      </a>
+    ) : (
+      <>
+        <img
+          src={src}
+          srcset={srcset}
+          sizes="(min-width: 768px) 50vw, 100vw"
+          alt={title}
+          width="600"
+          height="400"
+          loading={loading}
+          decoding="async"
+        />
+        {location && <figcaption class="photo-location">{location}</figcaption>}
+      </>
+    )
+  }
 </figure>
 
 <style>
