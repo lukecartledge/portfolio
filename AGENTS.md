@@ -26,7 +26,7 @@ cd sanity && npx sanity build  # Build Studio
   - Studio: `sanity/` directory (deploys to lukecartledge.sanity.studio)
 - **Hosting**: Cloudflare Pages (`wrangler.toml`)
 - **Styling**: Vanilla CSS with custom properties. No Tailwind, no CSS-in-JS.
-- **Fonts**: Playfair Display (headings), Satoshi variable (body) — self-hosted in `public/fonts/`
+- **Fonts**: Raleway (headings, 400/700), Poppins (body, 400) — self-hosted woff2 in `public/fonts/`
 
 ## Conventions
 
