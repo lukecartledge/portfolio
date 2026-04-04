@@ -10,6 +10,6 @@ export default tseslint.config(
   ...eslintPluginAstro.configs.recommended,
   eslintConfigPrettier, // must be last — disables formatting rules that conflict with Prettier
   {
-    ignores: ['dist/', '.astro/', 'sanity/', 'node_modules/'],
+    ignores: ['dist/', '.astro/', 'node_modules/'],
   },
 )

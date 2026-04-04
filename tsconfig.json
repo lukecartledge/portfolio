@@ -6,5 +6,5 @@
       "@/*": ["src/*"]
     }
   },
-  "exclude": ["sanity", "dist", "node_modules"]
+  "exclude": ["dist", "node_modules"]
 }
