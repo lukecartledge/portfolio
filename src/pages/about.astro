@@ -1,22 +1,20 @@
 ---
 import { getCollection } from 'astro:content'
 import Page from '@/layouts/Page.astro'
-import { PortableText } from 'astro-portabletext'
-import { urlFor } from '@/lib/image'
+import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
+import { imageUrl } from '@/lib/image'
 
 const siteConfigEntries = await getCollection('siteConfig')
 const config = siteConfigEntries[0]?.data
 
 if (!config) {
-  throw new Error('siteConfig not found in Sanity. Ensure at least one siteConfig document exists.')
+  throw new Error('siteConfig not found. Ensure at least one siteConfig document exists.')
 }
 
 const title = `About — ${config.title}`
 const description = config.seo?.metaDescription ?? config.tagline
 
-const profileSrc = config.profileImage
-  ? urlFor(config.profileImage).width(480).quality(80).auto('format').url()
-  : undefined
+const profileSrc = config.profileImage ? imageUrl(config.profileImage, 480, 80) : undefined
 ---
 
 <Page title={title} description={description}>
@@ -36,7 +34,7 @@ const profileSrc = config.profileImage
       )
     }
     <div class="about-content prose">
-      {config.bio && <PortableText value={config.bio} />}
+      {config.bio && <Fragment set:html={documentToHtmlString(config.bio)} />}
     </div>
   </section>
 </Page>

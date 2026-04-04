@@ -1,9 +1,9 @@
 ---
 import PhotoCard from '@/components/PhotoCard.astro'
-import type { SanityImageSource } from '@sanity/image-url'
+import type { ContentfulAsset } from '@/lib/image'
 
 type Photo = {
-  image: SanityImageSource & { asset?: { _ref?: string } }
+  image: ContentfulAsset
   title: string
   location?: string
   slug?: string

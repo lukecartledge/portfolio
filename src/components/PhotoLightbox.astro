@@ -1,9 +1,9 @@
 ---
-import type { SanityImageSource } from '@sanity/image-url'
-import { urlFor } from '@/lib/image'
+import type { ContentfulAsset } from '@/lib/image'
+import { imageUrl } from '@/lib/image'
 
 type LightboxPhoto = {
-  image: SanityImageSource
+  image: ContentfulAsset
   title: string
 }
 
@@ -14,7 +14,7 @@ interface Props {
 const { photos } = Astro.props
 
 const lightboxData = photos.map((p) => ({
-  src: urlFor(p.image).width(1600).quality(85).auto('format').url(),
+  src: imageUrl(p.image, 1600, 85),
   title: p.title,
 }))
 ---
