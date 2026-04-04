@@ -28,6 +28,13 @@ const GRID_SIZES: ImageSize[] = [
   { width: 800, quality: 75 },
 ]
 
+const MASONRY_SIZES: ImageSize[] = [
+  { width: 400, quality: 75 },
+  { width: 600, quality: 75 },
+  { width: 800, quality: 80 },
+  { width: 1000, quality: 80 },
+]
+
 const OG_SIZE: ImageSize = { width: 1200, height: 630, quality: 85 }
 
 export function heroSrcset(source: SanityImageSource): string {
@@ -47,6 +54,13 @@ export function gridSrcset(source: SanityImageSource): string {
         .quality(quality!)
         .auto('format')
         .url()} ${width}w`,
+  ).join(', ')
+}
+
+export function masonrySrcset(source: SanityImageSource): string {
+  return MASONRY_SIZES.map(
+    ({ width, quality }) =>
+      `${urlFor(source).width(width).quality(quality!).auto('format').url()} ${width}w`,
   ).join(', ')
 }
 

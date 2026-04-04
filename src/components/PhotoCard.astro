@@ -1,96 +1,81 @@
 ---
 import type { SanityImageSource } from '@sanity/image-url'
-import { urlFor, gridSrcset } from '@/lib/image'
+import { urlFor, masonrySrcset } from '@/lib/image'
 
 interface Props {
-  image: SanityImageSource
+  image: SanityImageSource & { asset?: { _ref?: string } }
   title: string
-  location?: string
   href?: string
   loading?: 'lazy' | 'eager'
 }
 
-const { image, title, location, href, loading = 'lazy' } = Astro.props
+const { image, title, href, loading = 'lazy' } = Astro.props
 
-const src = urlFor(image).width(600).height(400).fit('crop').quality(75).auto('format').url()
-const srcset = gridSrcset(image)
+const src = urlFor(image).width(600).quality(75).auto('format').url()
+const srcset = masonrySrcset(image)
+
+const ref = (image as { asset?: { _ref?: string } })?.asset?._ref ?? ''
+const dimMatch = ref.match(/-(\d+)x(\d+)[-.]/)
+const naturalWidth = dimMatch ? Number(dimMatch[1]) : 800
+const naturalHeight = dimMatch ? Number(dimMatch[2]) : 600
+const displayWidth = 600
+const displayHeight = Math.round(displayWidth * (naturalHeight / naturalWidth))
 ---
 
-<figure class="photo-card">
-  {
-    href ? (
-      <a href={href} class="photo-link">
-        <img
-          src={src}
-          srcset={srcset}
-          sizes="(min-width: 768px) 50vw, 100vw"
-          alt={title}
-          width="600"
-          height="400"
-          loading={loading}
-          decoding="async"
-        />
-        {location && <figcaption class="photo-location">{location}</figcaption>}
-      </a>
-    ) : (
-      <>
-        <img
-          src={src}
-          srcset={srcset}
-          sizes="(min-width: 768px) 50vw, 100vw"
-          alt={title}
-          width="600"
-          height="400"
-          loading={loading}
-          decoding="async"
-        />
-        {location && <figcaption class="photo-location">{location}</figcaption>}
-      </>
-    )
-  }
+<figure class="photo-card" data-photo-id={href}>
+  <img
+    src={src}
+    srcset={srcset}
+    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+    alt={title}
+    width={displayWidth}
+    height={displayHeight}
+    loading={loading}
+    decoding="async"
+  />
+  <div class="photo-overlay">
+    <span class="photo-title">{title}</span>
+  </div>
 </figure>
 
 <style>
   .photo-card {
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    line-height: 0;
   }
 
   .photo-card img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform var(--duration-normal) var(--ease-out);
+    height: auto;
+    display: block;
+    transition: transform var(--duration-slow) var(--ease-editorial);
   }
 
   .photo-card:hover img {
-    transform: scale(1.02);
+    transform: scale(1.03);
   }
 
-  .photo-link {
-    display: block;
-    text-decoration: none;
-  }
-
-  .photo-link:hover {
-    opacity: 1;
-  }
-
-  .photo-location {
+  .photo-overlay {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: var(--space-3) var(--space-4);
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
-    color: var(--color-bg);
-    font-size: var(--text-sm);
+    inset: 0;
+    background: var(--overlay-gradient);
+    display: flex;
+    align-items: flex-end;
+    padding: var(--space-4);
     opacity: 0;
-    transition: opacity var(--duration-normal) var(--ease-out);
+    transition: opacity 200ms ease;
   }
 
-  .photo-card:hover .photo-location {
+  .photo-card:hover .photo-overlay {
     opacity: 1;
+  }
+
+  .photo-title {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: #ffffff;
+    letter-spacing: 0.02em;
   }
 </style>

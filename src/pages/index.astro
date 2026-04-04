@@ -1,10 +1,7 @@
 ---
 import { getCollection } from 'astro:content'
 import Page from '@/layouts/Page.astro'
-import PhotoHero from '@/components/PhotoHero.astro'
 import PhotoGrid from '@/components/PhotoGrid.astro'
-import SocialLinks from '@/components/SocialLinks.astro'
-import { PortableText } from 'astro-portabletext'
 import { ogImageUrl } from '@/lib/image'
 
 const siteConfigEntries = await getCollection('siteConfig')
@@ -14,131 +11,36 @@ if (!config) {
   throw new Error('siteConfig not found in Sanity. Ensure at least one siteConfig document exists.')
 }
 
+const allPhotos = await getCollection('photos')
+const photos = allPhotos
+  .map((entry) => entry.data)
+  .sort(
+    (a, b) =>
+      ((a as { displayOrder?: number }).displayOrder ?? 99) -
+      ((b as { displayOrder?: number }).displayOrder ?? 99),
+  )
+  .map((p) => ({
+    image: (p as { image: unknown }).image as import('@sanity/image-url').SanityImageSource & {
+      asset?: { _ref?: string }
+    },
+    title: (p as { title: string }).title,
+    slug: (p as { slug?: { current: string } }).slug?.current,
+  }))
+
 const heroPhoto = config.featuredPhotos?.[0]
-const gridPhotos = config.featuredPhotos?.slice(1) ?? []
-
-const socialLinks = (config.socialLinks ?? []).map((link: { platform: string; url: string }) => {
-  const labels: Record<string, string> = {
-    instagram: 'Instagram',
-    github: 'GitHub',
-    email: 'Email',
-  }
-  return {
-    platform: link.platform as 'instagram' | 'github' | 'email',
-    url: link.url,
-    label: labels[link.platform] ?? link.platform,
-  }
-})
-
 const title = config.seo?.metaTitle ?? `${config.title} — ${config.tagline}`
 const description = config.seo?.metaDescription ?? config.tagline
 const ogImage = heroPhoto?.image ? ogImageUrl(heroPhoto.image) : undefined
 ---
 
 <Page title={title} description={description} ogImage={ogImage}>
-  {
-    heroPhoto && (
-      <PhotoHero image={heroPhoto.image} alt={heroPhoto.title} overlay>
-        <p class="hero-label">{config.tagline}</p>
-      </PhotoHero>
-    )
-  }
-
-  <section class="bio container prose">
-    {config.bio && <PortableText value={config.bio} />}
-    {
-      socialLinks.length > 0 && (
-        <div class="bio-social">
-          <SocialLinks links={socialLinks} />
-        </div>
-      )
-    }
+  <section class="gallery container">
+    {photos.length > 0 && <PhotoGrid photos={photos} />}
   </section>
-
-  {
-    gridPhotos.length > 0 && (
-      <section class="featured container">
-        <h2 class="section-heading">Featured Work</h2>
-        <PhotoGrid
-          photos={gridPhotos.map(
-            (p: {
-              image: unknown
-              title: string
-              location?: string
-              slug?: { current: string }
-            }) => ({
-              image: p.image,
-              title: p.title,
-              location: p.location,
-              slug: p.slug?.current,
-            }),
-          )}
-        />
-      </section>
-    )
-  }
 </Page>
 
 <style>
-  .hero-label {
-    font-size: var(--text-sm);
-    color: var(--color-bg);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  /* --- Page-load entry animations via @starting-style --- */
-
-  .bio {
-    padding-block: var(--space-32);
-    opacity: 1;
-    transform: translateY(0);
-    transition:
-      opacity var(--duration-slow) var(--ease-editorial),
-      transform var(--duration-slow) var(--ease-editorial);
-  }
-
-  @starting-style {
-    .bio {
-      opacity: 0;
-      transform: translateY(1.5rem);
-    }
-  }
-
-  .bio :global(p) {
-    font-size: var(--text-lg);
-    line-height: var(--leading-relaxed);
-    color: var(--color-text);
-  }
-
-  .bio :global(p + p) {
-    margin-top: var(--space-4);
-  }
-
-  .bio-social {
-    display: flex;
-    justify-content: flex-start;
-    margin-top: var(--space-8);
-  }
-
-  .featured {
-    padding-block: var(--space-24) var(--space-32);
-    opacity: 1;
-    transform: translateY(0);
-    transition:
-      opacity var(--duration-slow) var(--ease-editorial) 200ms,
-      transform var(--duration-slow) var(--ease-editorial) 200ms;
-  }
-
-  @starting-style {
-    .featured {
-      opacity: 0;
-      transform: translateY(1.5rem);
-    }
-  }
-
-  .section-heading {
-    margin-bottom: var(--space-12);
-    font-size: var(--text-xl);
+  .gallery {
+    padding-block: var(--space-4) var(--space-16);
   }
 </style>
