@@ -12,19 +12,19 @@ updates:
     groups:
       astro:
         patterns:
-          - "astro"
-          - "@astrojs/*"
+          - 'astro'
+          - '@astrojs/*'
       sanity:
         patterns:
-          - "@sanity/*"
-          - "sanity"
+          - '@sanity/*'
+          - 'sanity'
       lint:
         patterns:
-          - "eslint*"
-          - "@eslint/*"
-          - "prettier*"
-          - "typescript-eslint"
-          - "eslint-*"
+          - 'eslint*'
+          - '@eslint/*'
+          - 'prettier*'
+          - 'typescript-eslint'
+          - 'eslint-*'
 
   - package-ecosystem: github-actions
     directory: /
