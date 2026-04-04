@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content'
 import Page from '@/layouts/Page.astro'
 import PhotoGrid from '@/components/PhotoGrid.astro'
+import PhotoLightbox from '@/components/PhotoLightbox.astro'
 import { ogImageUrl } from '@/lib/image'
 
 const siteConfigEntries = await getCollection('siteConfig')
@@ -37,6 +38,7 @@ const ogImage = heroPhoto?.image ? ogImageUrl(heroPhoto.image) : undefined
   <section class="gallery container">
     {photos.length > 0 && <PhotoGrid photos={photos} />}
   </section>
+  <PhotoLightbox photos={photos.map((p) => ({ image: p.image, title: p.title }))} />
 </Page>
 
 <style>
