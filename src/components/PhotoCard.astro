@@ -1,9 +1,9 @@
 ---
-import type { SanityImageSource } from '@sanity/image-url'
-import { urlFor, masonrySrcset } from '@/lib/image'
+import type { ContentfulAsset } from '@/lib/image'
+import { imageUrl, masonrySrcset, assetDimensions } from '@/lib/image'
 
 interface Props {
-  image: SanityImageSource & { asset?: { _ref?: string } }
+  image: ContentfulAsset
   title: string
   href?: string
   loading?: 'lazy' | 'eager'
@@ -11,13 +11,10 @@ interface Props {
 
 const { image, title, href, loading = 'lazy' } = Astro.props
 
-const src = urlFor(image).width(600).quality(75).auto('format').url()
+const src = imageUrl(image, 600, 75)
 const srcset = masonrySrcset(image)
 
-const ref = (image as { asset?: { _ref?: string } })?.asset?._ref ?? ''
-const dimMatch = ref.match(/-(\d+)x(\d+)[-.]/)
-const naturalWidth = dimMatch ? Number(dimMatch[1]) : 800
-const naturalHeight = dimMatch ? Number(dimMatch[2]) : 600
+const { width: naturalWidth, height: naturalHeight } = assetDimensions(image)
 const displayWidth = 600
 const displayHeight = Math.round(displayWidth * (naturalHeight / naturalWidth))
 ---

@@ -4,28 +4,23 @@ import Page from '@/layouts/Page.astro'
 import PhotoGrid from '@/components/PhotoGrid.astro'
 import PhotoLightbox from '@/components/PhotoLightbox.astro'
 import { ogImageUrl } from '@/lib/image'
+import type { ContentfulAsset } from '@/lib/image'
 
 const siteConfigEntries = await getCollection('siteConfig')
 const config = siteConfigEntries[0]?.data
 
 if (!config) {
-  throw new Error('siteConfig not found in Sanity. Ensure at least one siteConfig document exists.')
+  throw new Error('siteConfig not found. Ensure at least one siteConfig document exists.')
 }
 
 const allPhotos = await getCollection('photos')
 const photos = allPhotos
   .map((entry) => entry.data)
-  .sort(
-    (a, b) =>
-      ((a as { displayOrder?: number }).displayOrder ?? 99) -
-      ((b as { displayOrder?: number }).displayOrder ?? 99),
-  )
+  .sort((a, b) => (a.displayOrder ?? 99) - (b.displayOrder ?? 99))
   .map((p) => ({
-    image: (p as { image: unknown }).image as import('@sanity/image-url').SanityImageSource & {
-      asset?: { _ref?: string }
-    },
-    title: (p as { title: string }).title,
-    slug: (p as { slug?: { current: string } }).slug?.current,
+    image: p.image as ContentfulAsset,
+    title: p.title,
+    slug: p.slug,
   }))
 
 const heroPhoto = config.featuredPhotos?.[0]

@@ -15,18 +15,19 @@ const { title, description, ogImage } = Astro.props
 const siteConfigEntries = await getCollection('siteConfig')
 const config = siteConfigEntries[0]?.data
 
-const socialLinks = (config?.socialLinks ?? []).map((link: { platform: string; url: string }) => {
-  const labels: Record<string, string> = {
-    instagram: 'Instagram',
-    github: 'GitHub',
-    email: 'Email',
-  }
-  return {
-    platform: link.platform as 'instagram' | 'github' | 'email',
-    url: link.url,
-    label: labels[link.platform] ?? link.platform,
-  }
-})
+const labels: Record<string, string> = {
+  instagram: 'Instagram',
+  github: 'GitHub',
+  email: 'Email',
+}
+const rawLinks = config?.socialLinks ?? {}
+const socialLinks = Object.entries(rawLinks)
+  .filter(([, url]) => typeof url === 'string' && url.length > 0)
+  .map(([platform, url]) => ({
+    platform: platform as 'instagram' | 'github' | 'email',
+    url: url as string,
+    label: labels[platform] ?? platform,
+  }))
 ---
 
 <Base title={title} description={description} ogImage={ogImage}>
