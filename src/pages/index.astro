@@ -1,67 +1,82 @@
 ---
-import { getCollection } from 'astro:content';
-import Page from '@/layouts/Page.astro';
-import PhotoHero from '@/components/PhotoHero.astro';
-import PhotoGrid from '@/components/PhotoGrid.astro';
-import SocialLinks from '@/components/SocialLinks.astro';
-import { PortableText } from 'astro-portabletext';
-import { ogImageUrl } from '@/lib/image';
+import { getCollection } from 'astro:content'
+import Page from '@/layouts/Page.astro'
+import PhotoHero from '@/components/PhotoHero.astro'
+import PhotoGrid from '@/components/PhotoGrid.astro'
+import SocialLinks from '@/components/SocialLinks.astro'
+import { PortableText } from 'astro-portabletext'
+import { ogImageUrl } from '@/lib/image'
 
-const siteConfigEntries = await getCollection('siteConfig');
-const config = siteConfigEntries[0]?.data;
+const siteConfigEntries = await getCollection('siteConfig')
+const config = siteConfigEntries[0]?.data
 
 if (!config) {
-  throw new Error('siteConfig not found in Sanity. Ensure at least one siteConfig document exists.');
+  throw new Error('siteConfig not found in Sanity. Ensure at least one siteConfig document exists.')
 }
 
-const heroPhoto = config.featuredPhotos?.[0];
-const gridPhotos = config.featuredPhotos?.slice(1) ?? [];
+const heroPhoto = config.featuredPhotos?.[0]
+const gridPhotos = config.featuredPhotos?.slice(1) ?? []
 
 const socialLinks = (config.socialLinks ?? []).map((link: { platform: string; url: string }) => {
   const labels: Record<string, string> = {
     instagram: 'Instagram',
     github: 'GitHub',
     email: 'Email',
-  };
+  }
   return {
     platform: link.platform as 'instagram' | 'github' | 'email',
     url: link.url,
     label: labels[link.platform] ?? link.platform,
-  };
-});
+  }
+})
 
-const title = config.seo?.metaTitle ?? `${config.title} — ${config.tagline}`;
-const description = config.seo?.metaDescription ?? config.tagline;
-const ogImage = heroPhoto?.image ? ogImageUrl(heroPhoto.image) : undefined;
+const title = config.seo?.metaTitle ?? `${config.title} — ${config.tagline}`
+const description = config.seo?.metaDescription ?? config.tagline
+const ogImage = heroPhoto?.image ? ogImageUrl(heroPhoto.image) : undefined
 ---
 
 <Page title={title} description={description} ogImage={ogImage}>
-  {heroPhoto && (
-    <PhotoHero image={heroPhoto.image} alt={heroPhoto.title} overlay>
-      <p class="hero-label">{config.tagline}</p>
-    </PhotoHero>
-  )}
+  {
+    heroPhoto && (
+      <PhotoHero image={heroPhoto.image} alt={heroPhoto.title} overlay>
+        <p class="hero-label">{config.tagline}</p>
+      </PhotoHero>
+    )
+  }
 
   <section class="bio container prose">
     {config.bio && <PortableText value={config.bio} />}
-    {socialLinks.length > 0 && (
-      <div class="bio-social">
-        <SocialLinks links={socialLinks} />
-      </div>
-    )}
+    {
+      socialLinks.length > 0 && (
+        <div class="bio-social">
+          <SocialLinks links={socialLinks} />
+        </div>
+      )
+    }
   </section>
 
-  {gridPhotos.length > 0 && (
-    <section class="featured container">
-      <h2 class="section-heading">Featured Work</h2>
-      <PhotoGrid photos={gridPhotos.map((p: { image: unknown; title: string; location?: string; slug?: { current: string } }) => ({
-        image: p.image,
-        title: p.title,
-        location: p.location,
-        slug: p.slug?.current,
-      }))} />
-    </section>
-  )}
+  {
+    gridPhotos.length > 0 && (
+      <section class="featured container">
+        <h2 class="section-heading">Featured Work</h2>
+        <PhotoGrid
+          photos={gridPhotos.map(
+            (p: {
+              image: unknown
+              title: string
+              location?: string
+              slug?: { current: string }
+            }) => ({
+              image: p.image,
+              title: p.title,
+              location: p.location,
+              slug: p.slug?.current,
+            }),
+          )}
+        />
+      </section>
+    )
+  }
 </Page>
 
 <style>
