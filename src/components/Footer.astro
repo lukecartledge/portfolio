@@ -2,24 +2,15 @@
 const currentYear = new Date().getFullYear()
 ---
 
-<footer class="footer">
-  <div class="container footer-inner">
-    <p class="copyright">&copy; {currentYear} Luke Cartledge</p>
-  </div>
+<footer class="footer container">
+  <p class="copyright">&copy; {currentYear} Luke Cartledge</p>
 </footer>
 
 <style>
   .footer {
-    padding-block: var(--space-16);
+    padding-block: var(--space-8);
     margin-top: var(--space-16);
-  }
-
-  .footer-inner {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--space-4);
+    text-align: center;
   }
 
   .copyright {
