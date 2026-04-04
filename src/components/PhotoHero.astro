@@ -1,17 +1,17 @@
 ---
-import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
-import { urlFor, heroSrcset } from '@/lib/image';
+import type { SanityImageSource } from '@sanity/image-url'
+import { urlFor, heroSrcset } from '@/lib/image'
 
 interface Props {
-  image: SanityImageSource;
-  alt: string;
-  overlay?: boolean;
+  image: SanityImageSource
+  alt: string
+  overlay?: boolean
 }
 
-const { image, alt, overlay = false } = Astro.props;
+const { image, alt, overlay = false } = Astro.props
 
-const src = urlFor(image).width(1920).quality(80).auto('format').url();
-const srcset = heroSrcset(image);
+const src = urlFor(image).width(1920).quality(80).auto('format').url()
+const srcset = heroSrcset(image)
 ---
 
 <section class:list={['photo-hero', { 'has-overlay': overlay }]}>
@@ -26,11 +26,13 @@ const srcset = heroSrcset(image);
     decoding="async"
     fetchpriority="high"
   />
-  {overlay && (
-    <div class="overlay">
-      <slot />
-    </div>
-  )}
+  {
+    overlay && (
+      <div class="overlay">
+        <slot />
+      </div>
+    )
+  }
 </section>
 
 <style>

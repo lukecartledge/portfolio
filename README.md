@@ -42,18 +42,18 @@ cd sanity && npx sanity deploy
 
 The Sanity dataset is **public**, so no API token is needed for reads. No `.env` file is required for local development or production builds.
 
-| Variable | Description | Required |
-|---|---|---|
+| Variable           | Description      | Required               |
+| ------------------ | ---------------- | ---------------------- |
 | `SANITY_API_TOKEN` | Sanity API token | No (dataset is public) |
 
 The project ID (`c42ibxe8`) and dataset (`production`) are configured directly in `astro.config.mjs` and `sanity/sanity.config.ts`.
 
 ## Scripts
 
-| Command | Description |
-|---|---|
-| `npm run dev` | Start local dev server |
-| `npm run build` | Build for production (`dist/`) |
+| Command           | Description                      |
+| ----------------- | -------------------------------- |
+| `npm run dev`     | Start local dev server           |
+| `npm run build`   | Build for production (`dist/`)   |
 | `npm run preview` | Preview production build locally |
 
 ## Project Structure
@@ -78,12 +78,12 @@ The project ID (`c42ibxe8`) and dataset (`production`) are configured directly i
 
 ## Sanity Schema
 
-| Type | Description |
-|------|-------------|
+| Type         | Description                                                    |
+| ------------ | -------------------------------------------------------------- |
 | `siteConfig` | Singleton — title, tagline, bio, social links, featured photos |
-| `photo` | Image with hotspot/crop, location, EXIF data, tags |
-| `collection` | Photo album — cover photo, photos, location, date |
-| `page` | Generic page — title, slug, rich text body, SEO fields |
+| `photo`      | Image with hotspot/crop, location, EXIF data, tags             |
+| `collection` | Photo album — cover photo, photos, location, date              |
+| `page`       | Generic page — title, slug, rich text body, SEO fields         |
 
 ## License
 

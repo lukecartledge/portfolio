@@ -29,7 +29,7 @@ const photos = defineCollection({
       _id, title, slug, image, caption, location, dateTaken,
       camera, lens, settings, tags, featured, displayOrder,
       "collections": collections[]->{ _id, title, slug }
-    }`
+    }`,
   ),
 })
 
@@ -39,7 +39,7 @@ const photoCollections = defineCollection({
       _id, title, slug, description, location, date, featured, displayOrder,
       coverPhoto->{ _id, title, image },
       "photos": photos[]->{ _id, title, slug, image, location }
-    }`
+    }`,
   ),
 })
 
@@ -48,14 +48,12 @@ const siteConfig = defineCollection({
     `*[_type == "siteConfig"][0...1] {
       _id, title, tagline, bio, profileImage, socialLinks, seo,
       "featuredPhotos": featuredPhotos[]->{ _id, title, slug, image, location, caption }
-    }`
+    }`,
   ),
 })
 
 const pages = defineCollection({
-  loader: sanityLoader(
-    `*[_type == "page"] { _id, title, slug, body, seo }`
-  ),
+  loader: sanityLoader(`*[_type == "page"] { _id, title, slug, body, seo }`),
 })
 
 export const collections = { photos, photoCollections, siteConfig, pages }

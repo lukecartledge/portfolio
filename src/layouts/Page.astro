@@ -1,15 +1,15 @@
 ---
-import Base from '@/layouts/Base.astro';
-import Header from '@/components/Header.astro';
-import Footer from '@/components/Footer.astro';
+import Base from '@/layouts/Base.astro'
+import Header from '@/components/Header.astro'
+import Footer from '@/components/Footer.astro'
 
 interface Props {
-  title: string;
-  description?: string;
-  ogImage?: string;
+  title: string
+  description?: string
+  ogImage?: string
 }
 
-const { title, description, ogImage } = Astro.props;
+const { title, description, ogImage } = Astro.props
 ---
 
 <Base title={title} description={description} ogImage={ogImage}>
