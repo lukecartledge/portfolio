@@ -1,0 +1,81 @@
+---
+import { getCollection } from 'astro:content'
+import Page from '@/layouts/Page.astro'
+import { PortableText } from 'astro-portabletext'
+import { urlFor } from '@/lib/image'
+
+const siteConfigEntries = await getCollection('siteConfig')
+const config = siteConfigEntries[0]?.data
+
+if (!config) {
+  throw new Error('siteConfig not found in Sanity. Ensure at least one siteConfig document exists.')
+}
+
+const title = `About — ${config.title}`
+const description = config.seo?.metaDescription ?? config.tagline
+
+const profileSrc = config.profileImage
+  ? urlFor(config.profileImage).width(480).quality(80).auto('format').url()
+  : undefined
+---
+
+<Page title={title} description={description}>
+  <section class="about container">
+    {
+      profileSrc && (
+        <div class="about-portrait">
+          <img
+            src={profileSrc}
+            alt={config.title}
+            width="480"
+            height="480"
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+      )
+    }
+    <div class="about-content prose">
+      {config.bio && <PortableText value={config.bio} />}
+    </div>
+  </section>
+</Page>
+
+<style>
+  .about {
+    padding-block: var(--space-12) var(--space-24);
+    display: grid;
+    gap: var(--space-12);
+    max-width: var(--max-prose);
+    margin-inline: auto;
+  }
+
+  .about-portrait {
+    max-width: 280px;
+  }
+
+  .about-portrait img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .about-content :global(p) {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .about-content :global(p + p) {
+    margin-top: var(--space-4);
+  }
+
+  @media (min-width: 768px) {
+    .about {
+      grid-template-columns: 280px 1fr;
+      align-items: start;
+      max-width: var(--max-content);
+      padding-block: var(--space-16) var(--space-32);
+    }
+  }
+</style>
