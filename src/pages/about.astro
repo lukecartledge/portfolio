@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content'
 import Page from '@/layouts/Page.astro'
 import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
-import { imageUrl } from '@/lib/image'
+import { imageUrl, ogImageUrl } from '@/lib/image'
 
 const siteConfigEntries = await getCollection('siteConfig')
 const config = siteConfigEntries[0]?.data
@@ -15,9 +15,10 @@ const title = `About — ${config.title}`
 const description = config.seo?.metaDescription ?? config.tagline
 
 const profileSrc = config.profileImage ? imageUrl(config.profileImage, 480, 80) : undefined
+const ogImage = config.profileImage ? ogImageUrl(config.profileImage) : undefined
 ---
 
-<Page title={title} description={description}>
+<Page title={title} description={description} ogImage={ogImage}>
   <section class="about container">
     {
       profileSrc && (
