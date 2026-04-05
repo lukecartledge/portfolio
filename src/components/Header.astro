@@ -70,7 +70,13 @@ const navLinks = [
   </div>
 </header>
 
-<input type="checkbox" id="mobile-nav-toggle" class="mobile-nav-checkbox" aria-hidden="true" />
+<input
+  type="checkbox"
+  id="mobile-nav-toggle"
+  class="mobile-nav-checkbox"
+  aria-hidden="true"
+  tabindex="-1"
+/>
 <div class="mobile-nav-overlay" aria-hidden="true">
   <label class="mobile-nav-overlay-bg" for="mobile-nav-toggle"></label>
   <nav class="mobile-nav-panel" aria-label="Mobile navigation">
