@@ -69,7 +69,15 @@ const lightboxData = photos.map((p) => ({
     </svg>
   </button>
   <figure class="lightbox-content">
-    <img class="lightbox-image" id="lightbox-image" src="" srcset="" sizes="90vw" alt="" />
+    <img
+      class="lightbox-image"
+      id="lightbox-image"
+      src=""
+      srcset=""
+      sizes="(max-aspect-ratio: 3/4) min(90vw, calc(80vh * 0.75)), min(90vw, calc(80vh * 1.5))"
+      alt=""
+      fetchpriority="high"
+    />
     <figcaption class="lightbox-caption" id="lightbox-caption"></figcaption>
   </figure>
 </div>
@@ -80,18 +88,38 @@ const lightboxData = photos.map((p) => ({
   const lightboxCaption = document.getElementById('lightbox-caption')
   let currentIndex = -1
 
+  const LIGHTBOX_SIZES_ATTR =
+    '(max-aspect-ratio: 3/4) min(90vw, calc(80vh * 0.75)), min(90vw, calc(80vh * 1.5))'
+
+  function preloadAdjacentImages(index) {
+    const indices = [index - 1, index + 1]
+    indices.forEach(function (i) {
+      if (i < 0 || i >= lightboxData.length) return
+      if (document.querySelector('link[data-lightbox-preload="' + i + '"]')) return
+      const link = document.createElement('link')
+      link.rel = 'preload'
+      link.as = 'image'
+      link.href = lightboxData[i].src
+      link.imageSrcset = lightboxData[i].srcset
+      link.imageSizes = LIGHTBOX_SIZES_ATTR
+      link.dataset.lightboxPreload = String(i)
+      document.head.appendChild(link)
+    })
+  }
+
   function openLightbox(index) {
     if (index < 0 || index >= lightboxData.length) return
     currentIndex = index
     const photo = lightboxData[currentIndex]
     lightboxImg.srcset = photo.srcset
-    lightboxImg.sizes = '90vw'
+    lightboxImg.sizes = LIGHTBOX_SIZES_ATTR
     lightboxImg.src = photo.src
     lightboxImg.alt = photo.title
     lightboxCaption.textContent = photo.title
     lightbox.classList.add('is-open')
     lightbox.setAttribute('aria-hidden', 'false')
     document.body.style.overflow = 'hidden'
+    preloadAdjacentImages(index)
   }
 
   function closeLightbox() {
@@ -99,6 +127,9 @@ const lightboxData = photos.map((p) => ({
     lightbox.setAttribute('aria-hidden', 'true')
     document.body.style.overflow = ''
     currentIndex = -1
+    document.querySelectorAll('link[data-lightbox-preload]').forEach(function (el) {
+      el.remove()
+    })
   }
 
   function showPrev() {
