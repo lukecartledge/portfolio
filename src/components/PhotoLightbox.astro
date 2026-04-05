@@ -1,6 +1,6 @@
 ---
 import type { ContentfulAsset } from '@/lib/image'
-import { imageUrl } from '@/lib/image'
+import { imageUrl, lightboxSrcset } from '@/lib/image'
 
 type LightboxPhoto = {
   image: ContentfulAsset
@@ -14,7 +14,8 @@ interface Props {
 const { photos } = Astro.props
 
 const lightboxData = photos.map((p) => ({
-  src: imageUrl(p.image, 1600, 85),
+  src: imageUrl(p.image, 1920, 85),
+  srcset: lightboxSrcset(p.image),
   title: p.title,
 }))
 ---
@@ -68,7 +69,14 @@ const lightboxData = photos.map((p) => ({
     </svg>
   </button>
   <figure class="lightbox-content">
-    <img class="lightbox-image" id="lightbox-image" src="" alt="" />
+    <img
+      class="lightbox-image"
+      id="lightbox-image"
+      src=""
+      srcset=""
+      sizes="90vw"
+      alt=""
+    />
     <figcaption class="lightbox-caption" id="lightbox-caption"></figcaption>
   </figure>
 </div>
@@ -83,6 +91,8 @@ const lightboxData = photos.map((p) => ({
     if (index < 0 || index >= lightboxData.length) return
     currentIndex = index
     const photo = lightboxData[currentIndex]
+    lightboxImg.srcset = photo.srcset
+    lightboxImg.sizes = '90vw'
     lightboxImg.src = photo.src
     lightboxImg.alt = photo.title
     lightboxCaption.textContent = photo.title
@@ -125,6 +135,43 @@ const lightboxData = photos.map((p) => ({
     if (e.key === 'ArrowLeft') showPrev()
     if (e.key === 'ArrowRight') showNext()
   })
+
+  // Touch swipe navigation for mobile
+  var touchStartX = 0
+  var touchStartY = 0
+  var isSwiping = false
+  var SWIPE_THRESHOLD = 50
+
+  lightbox.addEventListener('touchstart', function (e) {
+    if (currentIndex === -1) return
+    touchStartX = e.touches[0].clientX
+    touchStartY = e.touches[0].clientY
+    isSwiping = true
+  }, { passive: true })
+
+  lightbox.addEventListener('touchmove', function (e) {
+    if (!isSwiping) return
+    var dx = Math.abs(e.touches[0].clientX - touchStartX)
+    var dy = Math.abs(e.touches[0].clientY - touchStartY)
+    // If vertical scroll intent, cancel swipe detection
+    if (dy > dx) {
+      isSwiping = false
+    }
+  }, { passive: true })
+
+  lightbox.addEventListener('touchend', function (e) {
+    if (!isSwiping || currentIndex === -1) {
+      isSwiping = false
+      return
+    }
+    var dx = e.changedTouches[0].clientX - touchStartX
+    if (dx > SWIPE_THRESHOLD) {
+      showPrev()
+    } else if (dx < -SWIPE_THRESHOLD) {
+      showNext()
+    }
+    isSwiping = false
+  }, { passive: true })
 </script>
 
 <style>
