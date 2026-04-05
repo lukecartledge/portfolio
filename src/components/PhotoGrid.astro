@@ -31,6 +31,51 @@ const { photos } = Astro.props
   }
 </div>
 
+<script is:inline>
+  ;(function () {
+    const items = document.querySelectorAll('.gallery-grid-item')
+    if (!items.length || !('IntersectionObserver' in window)) {
+      items.forEach(function (el) {
+        el.classList.add('revealed')
+      })
+      return
+    }
+
+    const staggerDelay = 80
+    const batchMap = new Map()
+
+    const observer = new IntersectionObserver(
+      function (entries) {
+        const toReveal = []
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            toReveal.push(entry.target)
+            observer.unobserve(entry.target)
+          }
+        })
+
+        toReveal
+          .sort(function (a, b) {
+            return a.getBoundingClientRect().top - b.getBoundingClientRect().top
+          })
+          .forEach(function (el, i) {
+            const batch = batchMap.size
+            batchMap.set(el, batch)
+            el.style.transitionDelay = i * staggerDelay + 'ms'
+            requestAnimationFrame(function () {
+              el.classList.add('revealed')
+            })
+          })
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
+    )
+
+    items.forEach(function (el) {
+      observer.observe(el)
+    })
+  })()
+</script>
+
 <style>
   .gallery-grid {
     column-count: 1;
@@ -42,6 +87,19 @@ const { photos } = Astro.props
     display: inline-block;
     width: 100%;
     margin-bottom: var(--gallery-gap);
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(16px);
+    transition:
+      opacity var(--duration-slow) var(--ease-out),
+      filter var(--duration-slow) var(--ease-out),
+      transform var(--duration-slow) var(--ease-out);
+  }
+
+  .gallery-grid-item.revealed {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
   }
 
   @media (min-width: 640px) {
@@ -53,6 +111,15 @@ const { photos } = Astro.props
   @media (min-width: 1024px) {
     .gallery-grid {
       column-count: 3;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gallery-grid-item {
+      opacity: 1;
+      filter: none;
+      transform: none;
+      transition: none;
     }
   }
 </style>

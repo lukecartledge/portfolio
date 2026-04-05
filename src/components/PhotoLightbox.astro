@@ -1,6 +1,6 @@
 ---
 import type { ContentfulAsset } from '@/lib/image'
-import { imageUrl } from '@/lib/image'
+import { blurPlaceholder, imageUrl, lightboxSrcset } from '@/lib/image'
 
 type LightboxPhoto = {
   image: ContentfulAsset
@@ -14,7 +14,9 @@ interface Props {
 const { photos } = Astro.props
 
 const lightboxData = photos.map((p) => ({
-  src: imageUrl(p.image, 1600, 85),
+  src: imageUrl(p.image, 1920, 85),
+  srcset: lightboxSrcset(p.image),
+  blur: blurPlaceholder(p.image),
   title: p.title,
 }))
 ---
@@ -68,7 +70,17 @@ const lightboxData = photos.map((p) => ({
     </svg>
   </button>
   <figure class="lightbox-content">
-    <img class="lightbox-image" id="lightbox-image" src="" alt="" />
+    <div class="lightbox-image-wrap" id="lightbox-image-wrap">
+      <img
+        class="lightbox-image"
+        id="lightbox-image"
+        src=""
+        srcset=""
+        sizes="(max-aspect-ratio: 3/4) min(90vw, calc(80vh * 0.75)), min(90vw, calc(80vh * 1.5))"
+        alt=""
+        fetchpriority="high"
+      />
+    </div>
     <figcaption class="lightbox-caption" id="lightbox-caption"></figcaption>
   </figure>
 </div>
@@ -76,19 +88,67 @@ const lightboxData = photos.map((p) => ({
 <script is:inline define:vars={{ lightboxData }}>
   const lightbox = document.getElementById('lightbox')
   const lightboxImg = document.getElementById('lightbox-image')
+  const lightboxWrap = document.getElementById('lightbox-image-wrap')
   const lightboxCaption = document.getElementById('lightbox-caption')
   let currentIndex = -1
+
+  const LIGHTBOX_SIZES_ATTR =
+    '(max-aspect-ratio: 3/4) min(90vw, calc(80vh * 0.75)), min(90vw, calc(80vh * 1.5))'
+
+  function preloadAdjacentImages(index) {
+    const indices = [index - 1, index + 1]
+    indices.forEach(function (i) {
+      if (i < 0 || i >= lightboxData.length) return
+      if (document.querySelector('link[data-lightbox-preload="' + i + '"]')) return
+      const link = document.createElement('link')
+      link.rel = 'preload'
+      link.as = 'image'
+      link.href = lightboxData[i].src
+      link.imageSrcset = lightboxData[i].srcset
+      link.imageSizes = LIGHTBOX_SIZES_ATTR
+      link.dataset.lightboxPreload = String(i)
+      document.head.appendChild(link)
+    })
+  }
 
   function openLightbox(index) {
     if (index < 0 || index >= lightboxData.length) return
     currentIndex = index
     const photo = lightboxData[currentIndex]
+
+    // Reset image to transparent while loading
+    lightboxImg.classList.remove('is-loaded')
+
+    // Set sources — browser starts fetching
+    lightboxImg.srcset = photo.srcset
+    lightboxImg.sizes = LIGHTBOX_SIZES_ATTR
     lightboxImg.src = photo.src
     lightboxImg.alt = photo.title
+
+    // Show blur placeholder as background on wrapper
+    lightboxWrap.style.backgroundImage = 'url(' + photo.blur + ')'
+
+    // Use decode() to crossfade once pixels are ready
+    const capturedIndex = index
+    lightboxImg
+      .decode()
+      .then(function () {
+        if (currentIndex === capturedIndex) {
+          lightboxImg.classList.add('is-loaded')
+        }
+      })
+      .catch(function () {
+        // Show image anyway on decode failure
+        if (currentIndex === capturedIndex) {
+          lightboxImg.classList.add('is-loaded')
+        }
+      })
+
     lightboxCaption.textContent = photo.title
     lightbox.classList.add('is-open')
     lightbox.setAttribute('aria-hidden', 'false')
     document.body.style.overflow = 'hidden'
+    preloadAdjacentImages(index)
   }
 
   function closeLightbox() {
@@ -96,6 +156,9 @@ const lightboxData = photos.map((p) => ({
     lightbox.setAttribute('aria-hidden', 'true')
     document.body.style.overflow = ''
     currentIndex = -1
+    document.querySelectorAll('link[data-lightbox-preload]').forEach(function (el) {
+      el.remove()
+    })
   }
 
   function showPrev() {
@@ -125,6 +188,55 @@ const lightboxData = photos.map((p) => ({
     if (e.key === 'ArrowLeft') showPrev()
     if (e.key === 'ArrowRight') showNext()
   })
+
+  // Touch swipe navigation for mobile
+  let touchStartX = 0
+  let touchStartY = 0
+  let isSwiping = false
+  const SWIPE_THRESHOLD = 50
+
+  lightbox.addEventListener(
+    'touchstart',
+    function (e) {
+      if (currentIndex === -1) return
+      touchStartX = e.touches[0].clientX
+      touchStartY = e.touches[0].clientY
+      isSwiping = true
+    },
+    { passive: true },
+  )
+
+  lightbox.addEventListener(
+    'touchmove',
+    function (e) {
+      if (!isSwiping) return
+      const dx = Math.abs(e.touches[0].clientX - touchStartX)
+      const dy = Math.abs(e.touches[0].clientY - touchStartY)
+      // If vertical scroll intent, cancel swipe detection
+      if (dy > dx) {
+        isSwiping = false
+      }
+    },
+    { passive: true },
+  )
+
+  lightbox.addEventListener(
+    'touchend',
+    function (e) {
+      if (!isSwiping || currentIndex === -1) {
+        isSwiping = false
+        return
+      }
+      const dx = e.changedTouches[0].clientX - touchStartX
+      if (dx > SWIPE_THRESHOLD) {
+        showPrev()
+      } else if (dx < -SWIPE_THRESHOLD) {
+        showNext()
+      }
+      isSwiping = false
+    },
+    { passive: true },
+  )
 </script>
 
 <style>
@@ -217,6 +329,18 @@ const lightboxData = photos.map((p) => ({
     max-height: 80vh;
     object-fit: contain;
     pointer-events: auto;
+    opacity: 0;
+    transition: opacity 300ms var(--ease-out);
+  }
+
+  .lightbox-image.is-loaded {
+    opacity: 1;
+  }
+
+  .lightbox-image-wrap {
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 
   .lightbox-caption {
