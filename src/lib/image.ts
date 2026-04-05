@@ -71,6 +71,14 @@ const MASONRY_SIZES: ImageSize[] = [
   { width: 1000, quality: 80 },
 ]
 
+const LIGHTBOX_SIZES: ImageSize[] = [
+  { width: 640, quality: 80 },
+  { width: 1024, quality: 85 },
+  { width: 1440, quality: 85 },
+  { width: 1920, quality: 85 },
+  { width: 2560, quality: 85 },
+]
+
 const OG_SIZE: ImageSize = { width: 1200, height: 630, quality: 85 }
 
 export function imageUrl(asset: ContentfulAsset, width: number, quality = 80): string {
@@ -87,6 +95,12 @@ export function gridSrcset(asset: ContentfulAsset): string {
   return GRID_SIZES.map(
     ({ width, quality }) =>
       `${buildUrl(asset, { w: width, h: Math.round(width / 1.5), q: quality, fit: 'fill', f: 'faces' })} ${width}w`,
+  ).join(', ')
+}
+
+export function lightboxSrcset(asset: ContentfulAsset): string {
+  return LIGHTBOX_SIZES.map(
+    ({ width, quality }) => `${buildUrl(asset, { w: width, q: quality })} ${width}w`,
   ).join(', ')
 }
 
