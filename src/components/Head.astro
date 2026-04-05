@@ -30,6 +30,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site)
 <meta name="twitter:description" content={description} />
 {ogImage && <meta name="twitter:image" content={ogImage} />}
 
+<link rel="preconnect" href="https://images.ctfassets.net" crossorigin />
 <link rel="preload" href="/fonts/Raleway-Latin.woff2" as="font" type="font/woff2" crossorigin />
 <link
   rel="preload"
