@@ -69,14 +69,7 @@ const lightboxData = photos.map((p) => ({
     </svg>
   </button>
   <figure class="lightbox-content">
-    <img
-      class="lightbox-image"
-      id="lightbox-image"
-      src=""
-      srcset=""
-      sizes="90vw"
-      alt=""
-    />
+    <img class="lightbox-image" id="lightbox-image" src="" srcset="" sizes="90vw" alt="" />
     <figcaption class="lightbox-caption" id="lightbox-caption"></figcaption>
   </figure>
 </div>
@@ -137,41 +130,53 @@ const lightboxData = photos.map((p) => ({
   })
 
   // Touch swipe navigation for mobile
-  var touchStartX = 0
-  var touchStartY = 0
-  var isSwiping = false
-  var SWIPE_THRESHOLD = 50
+  let touchStartX = 0
+  let touchStartY = 0
+  let isSwiping = false
+  const SWIPE_THRESHOLD = 50
 
-  lightbox.addEventListener('touchstart', function (e) {
-    if (currentIndex === -1) return
-    touchStartX = e.touches[0].clientX
-    touchStartY = e.touches[0].clientY
-    isSwiping = true
-  }, { passive: true })
+  lightbox.addEventListener(
+    'touchstart',
+    function (e) {
+      if (currentIndex === -1) return
+      touchStartX = e.touches[0].clientX
+      touchStartY = e.touches[0].clientY
+      isSwiping = true
+    },
+    { passive: true },
+  )
 
-  lightbox.addEventListener('touchmove', function (e) {
-    if (!isSwiping) return
-    var dx = Math.abs(e.touches[0].clientX - touchStartX)
-    var dy = Math.abs(e.touches[0].clientY - touchStartY)
-    // If vertical scroll intent, cancel swipe detection
-    if (dy > dx) {
+  lightbox.addEventListener(
+    'touchmove',
+    function (e) {
+      if (!isSwiping) return
+      const dx = Math.abs(e.touches[0].clientX - touchStartX)
+      const dy = Math.abs(e.touches[0].clientY - touchStartY)
+      // If vertical scroll intent, cancel swipe detection
+      if (dy > dx) {
+        isSwiping = false
+      }
+    },
+    { passive: true },
+  )
+
+  lightbox.addEventListener(
+    'touchend',
+    function (e) {
+      if (!isSwiping || currentIndex === -1) {
+        isSwiping = false
+        return
+      }
+      const dx = e.changedTouches[0].clientX - touchStartX
+      if (dx > SWIPE_THRESHOLD) {
+        showPrev()
+      } else if (dx < -SWIPE_THRESHOLD) {
+        showNext()
+      }
       isSwiping = false
-    }
-  }, { passive: true })
-
-  lightbox.addEventListener('touchend', function (e) {
-    if (!isSwiping || currentIndex === -1) {
-      isSwiping = false
-      return
-    }
-    var dx = e.changedTouches[0].clientX - touchStartX
-    if (dx > SWIPE_THRESHOLD) {
-      showPrev()
-    } else if (dx < -SWIPE_THRESHOLD) {
-      showNext()
-    }
-    isSwiping = false
-  }, { passive: true })
+    },
+    { passive: true },
+  )
 </script>
 
 <style>
