@@ -72,6 +72,7 @@ const MASONRY_SIZES: ImageSize[] = [
 ]
 
 const LIGHTBOX_SIZES: ImageSize[] = [
+  { width: 400, quality: 80 },
   { width: 640, quality: 80 },
   { width: 1024, quality: 85 },
   { width: 1440, quality: 85 },
