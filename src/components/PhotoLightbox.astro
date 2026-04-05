@@ -1,6 +1,6 @@
 ---
 import type { ContentfulAsset } from '@/lib/image'
-import { imageUrl, lightboxSrcset } from '@/lib/image'
+import { blurPlaceholder, imageUrl, lightboxSrcset } from '@/lib/image'
 
 type LightboxPhoto = {
   image: ContentfulAsset
@@ -16,6 +16,7 @@ const { photos } = Astro.props
 const lightboxData = photos.map((p) => ({
   src: imageUrl(p.image, 1920, 85),
   srcset: lightboxSrcset(p.image),
+  blur: blurPlaceholder(p.image),
   title: p.title,
 }))
 ---
@@ -69,15 +70,17 @@ const lightboxData = photos.map((p) => ({
     </svg>
   </button>
   <figure class="lightbox-content">
-    <img
-      class="lightbox-image"
-      id="lightbox-image"
-      src=""
-      srcset=""
-      sizes="(max-aspect-ratio: 3/4) min(90vw, calc(80vh * 0.75)), min(90vw, calc(80vh * 1.5))"
-      alt=""
-      fetchpriority="high"
-    />
+    <div class="lightbox-image-wrap" id="lightbox-image-wrap">
+      <img
+        class="lightbox-image"
+        id="lightbox-image"
+        src=""
+        srcset=""
+        sizes="(max-aspect-ratio: 3/4) min(90vw, calc(80vh * 0.75)), min(90vw, calc(80vh * 1.5))"
+        alt=""
+        fetchpriority="high"
+      />
+    </div>
     <figcaption class="lightbox-caption" id="lightbox-caption"></figcaption>
   </figure>
 </div>
@@ -85,6 +88,7 @@ const lightboxData = photos.map((p) => ({
 <script is:inline define:vars={{ lightboxData }}>
   const lightbox = document.getElementById('lightbox')
   const lightboxImg = document.getElementById('lightbox-image')
+  const lightboxWrap = document.getElementById('lightbox-image-wrap')
   const lightboxCaption = document.getElementById('lightbox-caption')
   let currentIndex = -1
 
@@ -111,10 +115,35 @@ const lightboxData = photos.map((p) => ({
     if (index < 0 || index >= lightboxData.length) return
     currentIndex = index
     const photo = lightboxData[currentIndex]
+
+    // Reset image to transparent while loading
+    lightboxImg.classList.remove('is-loaded')
+
+    // Set sources — browser starts fetching
     lightboxImg.srcset = photo.srcset
     lightboxImg.sizes = LIGHTBOX_SIZES_ATTR
     lightboxImg.src = photo.src
     lightboxImg.alt = photo.title
+
+    // Show blur placeholder as background on wrapper
+    lightboxWrap.style.backgroundImage = 'url(' + photo.blur + ')'
+
+    // Use decode() to crossfade once pixels are ready
+    const capturedIndex = index
+    lightboxImg
+      .decode()
+      .then(function () {
+        if (currentIndex === capturedIndex) {
+          lightboxImg.classList.add('is-loaded')
+        }
+      })
+      .catch(function () {
+        // Show image anyway on decode failure
+        if (currentIndex === capturedIndex) {
+          lightboxImg.classList.add('is-loaded')
+        }
+      })
+
     lightboxCaption.textContent = photo.title
     lightbox.classList.add('is-open')
     lightbox.setAttribute('aria-hidden', 'false')
@@ -300,6 +329,18 @@ const lightboxData = photos.map((p) => ({
     max-height: 80vh;
     object-fit: contain;
     pointer-events: auto;
+    opacity: 0;
+    transition: opacity 300ms var(--ease-out);
+  }
+
+  .lightbox-image.is-loaded {
+    opacity: 1;
+  }
+
+  .lightbox-image-wrap {
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 
   .lightbox-caption {
