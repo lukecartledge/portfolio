@@ -1,6 +1,6 @@
 # lukecartledge.com
 
-Personal photography portfolio built with [Astro](https://astro.build) and [Contentful](https://www.contentful.com), deployed on [Cloudflare Pages](https://pages.cloudflare.com).
+Personal photography portfolio — live at [lukecartledge.com](https://lukecartledge.com). Built with [Astro](https://astro.build) and [Contentful](https://www.contentful.com), deployed on [Cloudflare Pages](https://pages.cloudflare.com).
 
 ## Stack
 

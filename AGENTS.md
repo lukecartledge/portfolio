@@ -25,22 +25,30 @@ npm run preview   # Preview production build
 
 ## Conventions
 
-- **Zero client-side JavaScript** in Phase 1. Astro ships no JS by default — keep it that way.
+- **Minimal client-side JavaScript**: `<script is:inline>` only for progressive enhancements (lightbox, gallery reveal animations, mobile nav). Astro ships no JS by default — keep new JS to enhancement-only patterns.
 - **Scoped styles**: Use `<style>` blocks in `.astro` components. Import `global.css` and `utilities.css` only in `Base.astro`.
 - **Design tokens**: All spacing, colors, typography use CSS custom properties from `src/styles/global.css`.
 - **Images**: All photography served from Contentful Images API (`images.ctfassets.net`) with `?fm=webp`. Use helpers in `src/lib/image.ts`.
 - **Atomic commits**: Each commit does one thing. Build passes before and after. Message has no "and".
 - **Content collections**: Astro content config at `src/content.config.ts` with custom Contentful loader.
 
+## Current Status
+
+- **Phase 6 complete** — site live at lukecartledge.com
+- **Phase 7 next** — Photo portfolio: collection/album pages, individual photo pages, homepage curation
+- **Remaining Phase 6 items** — Lighthouse ≥ 95 audit, OG meta social preview verification
+
 ## File Structure
 
 ```
 ├── src/
-│   ├── components/     # Reusable .astro components
-│   ├── content.config.ts  # Astro content collections
+│   ├── components/     # Reusable .astro components (Header, Footer, PhotoCard, PhotoGrid, PhotoLightbox, Head)
+│   ├── content.config.ts  # Astro content collections (custom Contentful loader)
 │   ├── layouts/        # Page layouts (Base, Page)
 │   ├── lib/            # Contentful client, image helpers
 │   ├── pages/          # Route pages
+│   │   ├── photo/      # Individual photo pages (Phase 7 — empty)
+│   │   └── photography/ # Collection pages (Phase 7 — empty)
 │   └── styles/         # global.css, utilities.css
 ```
 
