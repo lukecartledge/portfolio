@@ -5,6 +5,12 @@ import { blurPlaceholder, imageUrl, lightboxSrcset } from '@/lib/image'
 type LightboxPhoto = {
   image: ContentfulAsset
   title: string
+  location?: string
+  camera?: string
+  lens?: string
+  aperture?: string
+  shutterSpeed?: string
+  iso?: string
 }
 
 interface Props {
@@ -13,12 +19,23 @@ interface Props {
 
 const { photos } = Astro.props
 
-const lightboxData = photos.map((p) => ({
-  src: imageUrl(p.image, 1920, 85),
-  srcset: lightboxSrcset(p.image),
-  blur: blurPlaceholder(p.image),
-  title: p.title,
-}))
+const lightboxData = photos.map((p) => {
+  const exifParts: string[] = []
+  if (p.camera) exifParts.push(p.camera)
+  if (p.lens) exifParts.push(p.lens)
+  if (p.aperture) exifParts.push(p.aperture)
+  if (p.shutterSpeed) exifParts.push(p.shutterSpeed)
+  if (p.iso) exifParts.push('ISO ' + p.iso)
+
+  return {
+    src: imageUrl(p.image, 1920, 85),
+    srcset: lightboxSrcset(p.image),
+    blur: blurPlaceholder(p.image),
+    title: p.title,
+    location: p.location ?? '',
+    exif: exifParts.join(' · '),
+  }
+})
 ---
 
 <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true">
@@ -81,7 +98,11 @@ const lightboxData = photos.map((p) => ({
         fetchpriority="high"
       />
     </div>
-    <figcaption class="lightbox-caption" id="lightbox-caption"></figcaption>
+    <figcaption class="lightbox-caption" id="lightbox-caption">
+      <span class="lightbox-caption-title" id="lightbox-caption-title"></span>
+      <span class="lightbox-caption-location" id="lightbox-caption-location"></span>
+      <span class="lightbox-caption-exif" id="lightbox-caption-exif"></span>
+    </figcaption>
   </figure>
 </div>
 
@@ -89,7 +110,9 @@ const lightboxData = photos.map((p) => ({
   const lightbox = document.getElementById('lightbox')
   const lightboxImg = document.getElementById('lightbox-image')
   const lightboxWrap = document.getElementById('lightbox-image-wrap')
-  const lightboxCaption = document.getElementById('lightbox-caption')
+  const lightboxCaptionTitle = document.getElementById('lightbox-caption-title')
+  const lightboxCaptionLocation = document.getElementById('lightbox-caption-location')
+  const lightboxCaptionExif = document.getElementById('lightbox-caption-exif')
   let currentIndex = -1
 
   const LIGHTBOX_SIZES_ATTR =
@@ -144,7 +167,11 @@ const lightboxData = photos.map((p) => ({
         }
       })
 
-    lightboxCaption.textContent = photo.title
+    lightboxCaptionTitle.textContent = photo.title
+    lightboxCaptionLocation.textContent = photo.location
+    lightboxCaptionLocation.style.display = photo.location ? '' : 'none'
+    lightboxCaptionExif.textContent = photo.exif
+    lightboxCaptionExif.style.display = photo.exif ? '' : 'none'
     lightbox.classList.add('is-open')
     lightbox.setAttribute('aria-hidden', 'false')
     document.body.style.overflow = 'hidden'
@@ -345,11 +372,31 @@ const lightboxData = photos.map((p) => ({
 
   .lightbox-caption {
     margin-top: var(--space-3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25em;
+    pointer-events: auto;
+    text-align: center;
+  }
+
+  .lightbox-caption-title {
     font-family: var(--font-body);
     font-size: var(--text-sm);
     color: rgba(255, 255, 255, 0.7);
-    text-align: center;
-    pointer-events: auto;
+  }
+
+  .lightbox-caption-location {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .lightbox-caption-exif {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.02em;
   }
 
   @media (max-width: 639px) {

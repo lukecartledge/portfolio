@@ -6,6 +6,17 @@ import PhotoLightbox from '@/components/PhotoLightbox.astro'
 import { ogImageUrl } from '@/lib/image'
 import type { ContentfulAsset } from '@/lib/image'
 
+type PhotoWithExif = {
+  image: ContentfulAsset
+  title: string
+  location?: string
+  camera?: string
+  lens?: string
+  aperture?: string
+  shutterSpeed?: string
+  iso?: string
+}
+
 const siteConfigEntries = await getCollection('siteConfig')
 const config = siteConfigEntries[0]?.data
 
@@ -18,13 +29,18 @@ const featuredRefs = (config.featuredPhotos ?? []) as Array<{
 }>
 
 // Use curated featuredPhotos from siteConfig. Fall back to all photos if none set.
-let photos: Array<{ image: ContentfulAsset; title: string; slug: string }>
+let photos: PhotoWithExif[]
 
 if (featuredRefs.length > 0) {
   photos = featuredRefs.map((entry) => ({
     image: entry.fields.image as ContentfulAsset,
     title: entry.fields.title as string,
-    slug: entry.fields.slug as string,
+    location: (entry.fields.location as string) ?? undefined,
+    camera: (entry.fields.camera as string) ?? undefined,
+    lens: (entry.fields.lens as string) ?? undefined,
+    aperture: (entry.fields.aperture as string) ?? undefined,
+    shutterSpeed: (entry.fields.shutterSpeed as string) ?? undefined,
+    iso: (entry.fields.iso as string) ?? undefined,
   }))
 } else {
   const allPhotos = await getCollection('photos')
@@ -34,7 +50,12 @@ if (featuredRefs.length > 0) {
     .map((p) => ({
       image: p.image as ContentfulAsset,
       title: p.title as string,
-      slug: p.slug as string,
+      location: (p.location as string) ?? undefined,
+      camera: (p.camera as string) ?? undefined,
+      lens: (p.lens as string) ?? undefined,
+      aperture: (p.aperture as string) ?? undefined,
+      shutterSpeed: (p.shutterSpeed as string) ?? undefined,
+      iso: (p.iso as string) ?? undefined,
     }))
 }
 
@@ -50,7 +71,7 @@ const ogImage = heroPhoto?.fields?.image
   <section class="gallery container">
     {photos.length > 0 && <PhotoGrid photos={photos} />}
   </section>
-  <PhotoLightbox photos={photos.map((p) => ({ image: p.image, title: p.title }))} />
+  <PhotoLightbox photos={photos} />
 </Page>
 
 <style>

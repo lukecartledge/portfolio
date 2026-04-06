@@ -28,6 +28,12 @@ const photoRefs = (collection.photos as Array<{ fields: Record<string, unknown> 
 const photos = photoRefs.map((photoRef) => ({
   image: photoRef.fields.image as ContentfulAsset,
   title: photoRef.fields.title as string,
+  location: (photoRef.fields.location as string) ?? undefined,
+  camera: (photoRef.fields.camera as string) ?? undefined,
+  lens: (photoRef.fields.lens as string) ?? undefined,
+  aperture: (photoRef.fields.aperture as string) ?? undefined,
+  shutterSpeed: (photoRef.fields.shutterSpeed as string) ?? undefined,
+  iso: (photoRef.fields.iso as string) ?? undefined,
 }))
 
 const breadcrumb = [
@@ -49,7 +55,7 @@ const ogImage = ogImageUrl(coverImage)
 
     {photos.length > 0 && <PhotoGrid photos={photos} />}
   </section>
-  <PhotoLightbox photos={photos.map((p) => ({ image: p.image, title: p.title }))} />
+  <PhotoLightbox photos={photos} />
 </Page>
 
 <style>
