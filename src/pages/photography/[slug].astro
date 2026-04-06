@@ -2,7 +2,9 @@
 import { getCollection } from 'astro:content'
 import Page from '@/layouts/Page.astro'
 import Breadcrumb from '@/components/Breadcrumb.astro'
-import { masonrySrcset, assetDimensions, imageUrl, ogImageUrl } from '@/lib/image'
+import PhotoGrid from '@/components/PhotoGrid.astro'
+import PhotoLightbox from '@/components/PhotoLightbox.astro'
+import { ogImageUrl } from '@/lib/image'
 import type { ContentfulAsset } from '@/lib/image'
 
 export async function getStaticPaths() {
@@ -26,7 +28,6 @@ const photoRefs = (collection.photos as Array<{ fields: Record<string, unknown> 
 const photos = photoRefs.map((photoRef) => ({
   image: photoRef.fields.image as ContentfulAsset,
   title: photoRef.fields.title as string,
-  slug: photoRef.fields.slug as string,
 }))
 
 const breadcrumb = [
@@ -46,85 +47,10 @@ const ogImage = ogImageUrl(coverImage)
       <h1 class="collection-title">{title}</h1>
     </header>
 
-    {
-      photos.length > 0 && (
-        <div class="collection-grid">
-          {photos.map((photo, index) => {
-            const src = imageUrl(photo.image, 600, 75)
-            const srcset = masonrySrcset(photo.image)
-            const { width: naturalWidth, height: naturalHeight } = assetDimensions(photo.image)
-            const displayWidth = 600
-            const displayHeight = Math.round(displayWidth * (naturalHeight / naturalWidth))
-
-            return (
-              <div class="collection-grid-item">
-                <a href={`/photo/${photo.slug}`} class="photo-link">
-                  <figure class="photo-card">
-                    <img
-                      src={src}
-                      srcset={srcset}
-                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                      alt={photo.title}
-                      width={displayWidth}
-                      height={displayHeight}
-                      loading={index < 6 ? 'eager' : 'lazy'}
-                      decoding="async"
-                    />
-                    <div class="photo-overlay">
-                      <span class="photo-title">{photo.title}</span>
-                    </div>
-                  </figure>
-                </a>
-              </div>
-            )
-          })}
-        </div>
-      )
-    }
+    {photos.length > 0 && <PhotoGrid photos={photos} />}
   </section>
+  <PhotoLightbox photos={photos.map((p) => ({ image: p.image, title: p.title }))} />
 </Page>
-
-<script is:inline>
-  ;(function () {
-    const items = document.querySelectorAll('.collection-grid-item')
-    if (!items.length || !('IntersectionObserver' in window)) {
-      items.forEach(function (el) {
-        el.classList.add('revealed')
-      })
-      return
-    }
-
-    const staggerDelay = 80
-
-    const observer = new IntersectionObserver(
-      function (entries) {
-        const toReveal = []
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            toReveal.push(entry.target)
-            observer.unobserve(entry.target)
-          }
-        })
-
-        toReveal
-          .sort(function (a, b) {
-            return a.getBoundingClientRect().top - b.getBoundingClientRect().top
-          })
-          .forEach(function (el, i) {
-            el.style.transitionDelay = i * staggerDelay + 'ms'
-            requestAnimationFrame(function () {
-              el.classList.add('revealed')
-            })
-          })
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
-    )
-
-    items.forEach(function (el) {
-      observer.observe(el)
-    })
-  })()
-</script>
 
 <style>
   .collection {
@@ -139,97 +65,5 @@ const ogImage = ogImageUrl(coverImage)
     font-family: var(--font-heading);
     font-size: var(--text-2xl);
     font-weight: 700;
-  }
-
-  /* Masonry grid — CSS columns */
-  .collection-grid {
-    column-count: 1;
-    column-gap: var(--gallery-gap);
-  }
-
-  .collection-grid-item {
-    break-inside: avoid;
-    display: inline-block;
-    width: 100%;
-    margin-bottom: var(--gallery-gap);
-    opacity: 0;
-    filter: blur(8px);
-    transform: translateY(16px);
-    transition:
-      opacity var(--duration-slow) var(--ease-out),
-      filter var(--duration-slow) var(--ease-out),
-      transform var(--duration-slow) var(--ease-out);
-  }
-
-  .collection-grid-item.revealed {
-    opacity: 1;
-    filter: blur(0);
-    transform: translateY(0);
-  }
-
-  .photo-link {
-    display: block;
-    text-decoration: none;
-  }
-
-  .photo-card {
-    position: relative;
-    overflow: hidden;
-    line-height: 0;
-    margin: 0;
-  }
-
-  .photo-card img {
-    width: 100%;
-    height: auto;
-    display: block;
-    transition: transform var(--duration-slow) var(--ease-editorial);
-  }
-
-  .photo-link:hover .photo-card img {
-    transform: scale(1.03);
-  }
-
-  .photo-overlay {
-    position: absolute;
-    inset: 0;
-    background: var(--overlay-gradient);
-    display: flex;
-    align-items: flex-end;
-    padding: var(--space-4);
-    opacity: 0;
-    transition: opacity 200ms ease;
-  }
-
-  .photo-link:hover .photo-overlay {
-    opacity: 1;
-  }
-
-  .photo-title {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    color: #ffffff;
-    letter-spacing: 0.02em;
-  }
-
-  @media (min-width: 640px) {
-    .collection-grid {
-      column-count: 2;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .collection-grid {
-      column-count: 3;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .collection-grid-item {
-      opacity: 1;
-      filter: none;
-      transform: none;
-      transition: none;
-    }
   }
 </style>
