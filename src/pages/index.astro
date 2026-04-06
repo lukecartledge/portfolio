@@ -70,6 +70,9 @@ const ogImage = heroPhoto?.fields?.image
 <Page title={title} description={description} ogImage={ogImage}>
   <section class="gallery container">
     {photos.length > 0 && <PhotoGrid photos={photos} />}
+    <div class="gallery-cta">
+      <a href="/photography" class="cta-link">Browse collections &rarr;</a>
+    </div>
   </section>
   <PhotoLightbox photos={photos} />
 </Page>
@@ -77,5 +80,24 @@ const ogImage = heroPhoto?.fields?.image
 <style>
   .gallery {
     padding-block: var(--space-4) var(--space-16);
+  }
+
+  .gallery-cta {
+    margin-top: var(--space-12);
+    text-align: center;
+  }
+
+  .cta-link {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    letter-spacing: var(--nav-letter-spacing);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--color-text-muted);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .cta-link:hover {
+    color: var(--color-text);
   }
 </style>
