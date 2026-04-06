@@ -4,9 +4,8 @@ import Page from '@/layouts/Page.astro'
 import Breadcrumb from '@/components/Breadcrumb.astro'
 import { masonrySrcset, assetDimensions, imageUrl, ogImageUrl } from '@/lib/image'
 import type { ContentfulAsset } from '@/lib/image'
-import type { GetStaticPaths } from 'astro'
 
-export const getStaticPaths: GetStaticPaths = async () => {
+export async function getStaticPaths() {
   const allCollections = await getCollection('photoCollections')
 
   return allCollections.map((collection) => ({
