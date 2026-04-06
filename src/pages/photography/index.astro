@@ -4,6 +4,7 @@ import Page from '@/layouts/Page.astro'
 import CollectionCard from '@/components/CollectionCard.astro'
 import Breadcrumb from '@/components/Breadcrumb.astro'
 import type { ContentfulAsset } from '@/lib/image'
+import { ogImageUrl } from '@/lib/image'
 
 const allCollections = await getCollection('photoCollections')
 
@@ -26,9 +27,11 @@ const prepared = collections.map((collection) => {
 })
 
 const breadcrumb = [{ label: 'Home', href: '/' }, { label: 'Photography' }]
+
+const ogImage = prepared[0]?.coverImage ? ogImageUrl(prepared[0].coverImage) : undefined
 ---
 
-<Page title="Photography — Luke Cartledge">
+<Page title="Photography — Luke Cartledge" ogImage={ogImage}>
   <section class="photography container">
     <Breadcrumb items={breadcrumb} />
 
