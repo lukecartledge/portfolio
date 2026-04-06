@@ -1,0 +1,70 @@
+---
+interface Props {
+  camera?: string
+  lens?: string
+  aperture?: string
+  shutterSpeed?: string
+  iso?: string
+  focalLength?: string
+}
+
+const { camera, lens, aperture, shutterSpeed, iso, focalLength } = Astro.props
+
+const rows: { label: string; value: string | undefined }[] = [
+  { label: 'Camera', value: camera },
+  { label: 'Lens', value: lens },
+  { label: 'Aperture', value: aperture },
+  { label: 'Shutter', value: shutterSpeed },
+  { label: 'ISO', value: iso },
+  { label: 'Focal Length', value: focalLength },
+]
+
+const visibleRows = rows.filter((row) => row.value !== undefined && row.value !== '')
+---
+
+{
+  visibleRows.length > 0 && (
+    <dl class="exif-meta">
+      {visibleRows.map((row) => (
+        <div class="exif-row">
+          <dt class="exif-label">{row.label}</dt>
+          <dd class="exif-value">{row.value}</dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
+
+<style>
+  .exif-meta {
+    max-width: 400px;
+    font-family: var(--font-body);
+  }
+
+  .exif-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .exif-row:last-child {
+    border-bottom: none;
+  }
+
+  .exif-label {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    line-height: var(--leading-normal);
+    font-weight: 400;
+  }
+
+  .exif-value {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: var(--leading-normal);
+  }
+</style>

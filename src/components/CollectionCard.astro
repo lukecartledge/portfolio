@@ -1,0 +1,86 @@
+---
+import type { ContentfulAsset } from '@/lib/image'
+import { imageUrl, masonrySrcset, assetDimensions } from '@/lib/image'
+
+interface Props {
+  title: string
+  slug: string
+  coverImage: ContentfulAsset
+  description?: string
+}
+
+const { title, slug, coverImage, description } = Astro.props
+
+const src = imageUrl(coverImage, 800, 75)
+const srcset = masonrySrcset(coverImage)
+const { width, height } = assetDimensions(coverImage)
+---
+
+<a class="collection-card" href={`/photography/${slug}`} aria-label={title}>
+  <div class="collection-card-media">
+    <img
+      src={src}
+      srcset={srcset}
+      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+      alt={description ?? title}
+      width={width}
+      height={height}
+      loading="lazy"
+      decoding="async"
+      class="collection-card-img"
+    />
+    <div class="collection-card-overlay">
+      <span class="collection-card-title">{title}</span>
+    </div>
+  </div>
+</a>
+
+<style>
+  .collection-card {
+    display: block;
+    text-decoration: none;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .collection-card-media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+
+  .collection-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform var(--duration-slow) var(--ease-editorial);
+  }
+
+  .collection-card:hover .collection-card-img {
+    transform: scale(1.02);
+  }
+
+  .collection-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--overlay-gradient);
+    display: flex;
+    align-items: flex-end;
+    padding: var(--space-4);
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--ease-out);
+  }
+
+  .collection-card:hover .collection-card-overlay {
+    opacity: 1;
+  }
+
+  .collection-card-title {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: #ffffff;
+    letter-spacing: 0.02em;
+    line-height: var(--leading-snug);
+  }
+</style>

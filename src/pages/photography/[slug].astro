@@ -1,0 +1,75 @@
+---
+import { getCollection } from 'astro:content'
+import Page from '@/layouts/Page.astro'
+import Breadcrumb from '@/components/Breadcrumb.astro'
+import PhotoGrid from '@/components/PhotoGrid.astro'
+import PhotoLightbox from '@/components/PhotoLightbox.astro'
+import { ogImageUrl } from '@/lib/image'
+import type { ContentfulAsset } from '@/lib/image'
+
+export async function getStaticPaths() {
+  const allCollections = await getCollection('photoCollections')
+
+  return allCollections.map((collection) => ({
+    params: { slug: collection.data.slug as string },
+    props: { collection: collection.data },
+  }))
+}
+
+const { collection } = Astro.props
+
+const title = collection.title as string
+
+const coverPhotoRef = collection.coverPhoto as { fields: Record<string, unknown> }
+const coverImage = coverPhotoRef.fields.image as ContentfulAsset
+
+const photoRefs = (collection.photos as Array<{ fields: Record<string, unknown> }>) ?? []
+
+const photos = photoRefs.map((photoRef) => ({
+  image: photoRef.fields.image as ContentfulAsset,
+  title: photoRef.fields.title as string,
+  location: (photoRef.fields.location as string) ?? undefined,
+  camera: (photoRef.fields.camera as string) ?? undefined,
+  lens: (photoRef.fields.lens as string) ?? undefined,
+  aperture: (photoRef.fields.aperture as string) ?? undefined,
+  shutterSpeed: (photoRef.fields.shutterSpeed as string) ?? undefined,
+  iso: (photoRef.fields.iso as string) ?? undefined,
+}))
+
+const breadcrumb = [
+  { label: 'Home', href: '/' },
+  { label: 'Photography', href: '/photography' },
+  { label: title },
+]
+
+const ogImage = ogImageUrl(coverImage)
+---
+
+<Page title={`${title} — Photography — Luke Cartledge`} ogImage={ogImage}>
+  <section class="collection container">
+    <Breadcrumb items={breadcrumb} />
+
+    <header class="collection-header">
+      <h1 class="collection-title">{title}</h1>
+    </header>
+
+    {photos.length > 0 && <PhotoGrid photos={photos} />}
+  </section>
+  <PhotoLightbox photos={photos} />
+</Page>
+
+<style>
+  .collection {
+    padding-block: var(--space-4) var(--space-16);
+  }
+
+  .collection-header {
+    margin-block: var(--space-6) var(--space-8);
+  }
+
+  .collection-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+  }
+</style>

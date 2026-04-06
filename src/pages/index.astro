@@ -6,6 +6,17 @@ import PhotoLightbox from '@/components/PhotoLightbox.astro'
 import { ogImageUrl } from '@/lib/image'
 import type { ContentfulAsset } from '@/lib/image'
 
+type PhotoWithExif = {
+  image: ContentfulAsset
+  title: string
+  location?: string
+  camera?: string
+  lens?: string
+  aperture?: string
+  shutterSpeed?: string
+  iso?: string
+}
+
 const siteConfigEntries = await getCollection('siteConfig')
 const config = siteConfigEntries[0]?.data
 
@@ -13,27 +24,54 @@ if (!config) {
   throw new Error('siteConfig not found. Ensure at least one siteConfig document exists.')
 }
 
-const allPhotos = await getCollection('photos')
-const photos = allPhotos
-  .map((entry) => entry.data)
-  .sort((a, b) => (a.displayOrder ?? 99) - (b.displayOrder ?? 99))
-  .map((p) => ({
-    image: p.image as ContentfulAsset,
-    title: p.title,
-    slug: p.slug,
-  }))
+const featuredRefs = (config.featuredPhotos ?? []) as Array<{
+  fields: Record<string, unknown>
+}>
 
-const heroPhoto = config.featuredPhotos?.[0]
+// Use curated featuredPhotos from siteConfig. Fall back to all photos if none set.
+let photos: PhotoWithExif[]
+
+if (featuredRefs.length > 0) {
+  photos = featuredRefs.map((entry) => ({
+    image: entry.fields.image as ContentfulAsset,
+    title: entry.fields.title as string,
+    location: (entry.fields.location as string) ?? undefined,
+    camera: (entry.fields.camera as string) ?? undefined,
+    lens: (entry.fields.lens as string) ?? undefined,
+    aperture: (entry.fields.aperture as string) ?? undefined,
+    shutterSpeed: (entry.fields.shutterSpeed as string) ?? undefined,
+    iso: (entry.fields.iso as string) ?? undefined,
+  }))
+} else {
+  const allPhotos = await getCollection('photos')
+  photos = allPhotos
+    .map((e) => e.data)
+    .sort((a, b) => (a.displayOrder ?? 99) - (b.displayOrder ?? 99))
+    .map((p) => ({
+      image: p.image as ContentfulAsset,
+      title: p.title as string,
+      location: (p.location as string) ?? undefined,
+      camera: (p.camera as string) ?? undefined,
+      lens: (p.lens as string) ?? undefined,
+      aperture: (p.aperture as string) ?? undefined,
+      shutterSpeed: (p.shutterSpeed as string) ?? undefined,
+      iso: (p.iso as string) ?? undefined,
+    }))
+}
+
+const heroPhoto = featuredRefs[0]
 const title = config.seo?.metaTitle ?? `${config.title} — ${config.tagline}`
 const description = config.seo?.metaDescription ?? config.tagline
-const ogImage = heroPhoto?.image ? ogImageUrl(heroPhoto.image) : undefined
+const ogImage = heroPhoto?.fields?.image
+  ? ogImageUrl(heroPhoto.fields.image as ContentfulAsset)
+  : undefined
 ---
 
 <Page title={title} description={description} ogImage={ogImage}>
   <section class="gallery container">
     {photos.length > 0 && <PhotoGrid photos={photos} />}
   </section>
-  <PhotoLightbox photos={photos.map((p) => ({ image: p.image, title: p.title }))} />
+  <PhotoLightbox photos={photos} />
 </Page>
 
 <style>
