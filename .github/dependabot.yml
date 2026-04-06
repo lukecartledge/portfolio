@@ -14,10 +14,10 @@ updates:
         patterns:
           - 'astro'
           - '@astrojs/*'
-      sanity:
+      contentful:
         patterns:
-          - '@sanity/*'
-          - 'sanity'
+          - '@contentful/*'
+          - 'contentful'
       lint:
         patterns:
           - 'eslint*'
