@@ -13,20 +13,37 @@ if (!config) {
   throw new Error('siteConfig not found. Ensure at least one siteConfig document exists.')
 }
 
-const allPhotos = await getCollection('photos')
-const photos = allPhotos
-  .map((entry) => entry.data)
-  .sort((a, b) => (a.displayOrder ?? 99) - (b.displayOrder ?? 99))
-  .map((p) => ({
-    image: p.image as ContentfulAsset,
-    title: p.title,
-    slug: p.slug,
-  }))
+const featuredRefs = (config.featuredPhotos ?? []) as Array<{
+  fields: Record<string, unknown>
+}>
 
-const heroPhoto = config.featuredPhotos?.[0]
+// Use curated featuredPhotos from siteConfig. Fall back to all photos if none set.
+let photos: Array<{ image: ContentfulAsset; title: string; slug: string }>
+
+if (featuredRefs.length > 0) {
+  photos = featuredRefs.map((entry) => ({
+    image: entry.fields.image as ContentfulAsset,
+    title: entry.fields.title as string,
+    slug: entry.fields.slug as string,
+  }))
+} else {
+  const allPhotos = await getCollection('photos')
+  photos = allPhotos
+    .map((e) => e.data)
+    .sort((a, b) => (a.displayOrder ?? 99) - (b.displayOrder ?? 99))
+    .map((p) => ({
+      image: p.image as ContentfulAsset,
+      title: p.title as string,
+      slug: p.slug as string,
+    }))
+}
+
+const heroPhoto = featuredRefs[0]
 const title = config.seo?.metaTitle ?? `${config.title} — ${config.tagline}`
 const description = config.seo?.metaDescription ?? config.tagline
-const ogImage = heroPhoto?.image ? ogImageUrl(heroPhoto.image) : undefined
+const ogImage = heroPhoto?.fields?.image
+  ? ogImageUrl(heroPhoto.fields.image as ContentfulAsset)
+  : undefined
 ---
 
 <Page title={title} description={description} ogImage={ogImage}>
