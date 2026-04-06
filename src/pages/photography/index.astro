@@ -1,0 +1,94 @@
+---
+import { getCollection } from 'astro:content'
+import Page from '@/layouts/Page.astro'
+import CollectionCard from '@/components/CollectionCard.astro'
+import Breadcrumb from '@/components/Breadcrumb.astro'
+import type { ContentfulAsset } from '@/lib/image'
+
+const allCollections = await getCollection('photoCollections')
+
+const collections = allCollections
+  .map((c) => c.data)
+  .sort((a, b) => ((a.displayOrder as number) ?? 99) - ((b.displayOrder as number) ?? 99))
+
+type PhotoRef = { fields: Record<string, unknown> }
+
+const prepared = collections.map((collection) => {
+  const coverPhotoRef = collection.coverPhoto as PhotoRef
+  const coverImage = coverPhotoRef.fields.image as ContentfulAsset
+  const photosArray = (collection.photos as PhotoRef[]) ?? []
+
+  return {
+    title: collection.title as string,
+    slug: collection.slug as string,
+    coverImage,
+    photoCount: photosArray.length,
+    description: collection.description as string | undefined,
+  }
+})
+
+const breadcrumb = [{ label: 'Home', href: '/' }, { label: 'Photography' }]
+---
+
+<Page title="Photography — Luke Cartledge">
+  <section class="photography container">
+    <Breadcrumb items={breadcrumb} />
+
+    <h1 class="page-heading">Photography</h1>
+
+    {
+      prepared.length === 0 ? (
+        <p class="empty-message">No collections yet.</p>
+      ) : (
+        <div class="collections-grid">
+          {prepared.map((item) => (
+            <CollectionCard
+              title={item.title}
+              slug={item.slug}
+              coverImage={item.coverImage}
+              photoCount={item.photoCount}
+              description={item.description}
+            />
+          ))}
+        </div>
+      )
+    }
+  </section>
+</Page>
+
+<style>
+  .photography {
+    padding-block: var(--space-4) var(--space-16);
+  }
+
+  .page-heading {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin-block: var(--space-6) var(--space-8);
+  }
+
+  .collections-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--gallery-gap);
+  }
+
+  .empty-message {
+    color: var(--color-text-muted);
+    font-size: var(--text-base);
+    margin-top: var(--space-8);
+  }
+
+  @media (min-width: 640px) {
+    .collections-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .collections-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>
