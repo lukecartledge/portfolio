@@ -16,13 +16,11 @@ type PhotoRef = { fields: Record<string, unknown> }
 const prepared = collections.map((collection) => {
   const coverPhotoRef = collection.coverPhoto as PhotoRef
   const coverImage = coverPhotoRef.fields.image as ContentfulAsset
-  const photosArray = (collection.photos as PhotoRef[]) ?? []
 
   return {
     title: collection.title as string,
     slug: collection.slug as string,
     coverImage,
-    photoCount: photosArray.length,
     description: collection.description as string | undefined,
   }
 })
@@ -46,7 +44,6 @@ const breadcrumb = [{ label: 'Home', href: '/' }, { label: 'Photography' }]
               title={item.title}
               slug={item.slug}
               coverImage={item.coverImage}
-              photoCount={item.photoCount}
               description={item.description}
             />
           ))}

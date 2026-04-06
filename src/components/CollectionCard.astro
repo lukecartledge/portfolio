@@ -6,11 +6,10 @@ interface Props {
   title: string
   slug: string
   coverImage: ContentfulAsset
-  photoCount: number
   description?: string
 }
 
-const { title, slug, coverImage, photoCount, description } = Astro.props
+const { title, slug, coverImage, description } = Astro.props
 
 const src = imageUrl(coverImage, 800, 75)
 const srcset = masonrySrcset(coverImage)
@@ -31,12 +30,7 @@ const { width, height } = assetDimensions(coverImage)
       class="collection-card-img"
     />
     <div class="collection-card-overlay">
-      <div class="collection-card-info">
-        <span class="collection-card-title">{title}</span>
-        <span class="collection-card-count"
-          >{photoCount} {photoCount === 1 ? 'photo' : 'photos'}</span
-        >
-      </div>
+      <span class="collection-card-title">{title}</span>
     </div>
   </div>
 </a>
@@ -82,24 +76,11 @@ const { width, height } = assetDimensions(coverImage)
     opacity: 1;
   }
 
-  .collection-card-info {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-  }
-
   .collection-card-title {
     font-family: var(--font-body);
     font-size: var(--text-base);
     color: #ffffff;
     letter-spacing: 0.02em;
     line-height: var(--leading-snug);
-  }
-
-  .collection-card-count {
-    font-family: var(--font-body);
-    font-size: var(--text-xs);
-    color: rgba(255, 255, 255, 0.7);
-    letter-spacing: 0.04em;
   }
 </style>
