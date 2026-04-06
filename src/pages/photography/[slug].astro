@@ -17,8 +17,6 @@ export async function getStaticPaths() {
 const { collection } = Astro.props
 
 const title = collection.title as string
-const description = collection.description as string | undefined
-const location = collection.location as string | undefined
 
 const coverPhotoRef = collection.coverPhoto as { fields: Record<string, unknown> }
 const coverImage = coverPhotoRef.fields.image as ContentfulAsset
@@ -46,11 +44,6 @@ const ogImage = ogImageUrl(coverImage)
 
     <header class="collection-header">
       <h1 class="collection-title">{title}</h1>
-      {description && <p class="collection-description">{description}</p>}
-      <div class="collection-meta">
-        {location && <span class="meta-location">{location}</span>}
-        <span class="meta-count">{photos.length} {photos.length === 1 ? 'photo' : 'photos'}</span>
-      </div>
     </header>
 
     {
@@ -146,27 +139,6 @@ const ogImage = ogImageUrl(coverImage)
     font-family: var(--font-heading);
     font-size: var(--text-2xl);
     font-weight: 700;
-    margin-bottom: var(--space-3);
-  }
-
-  .collection-description {
-    font-size: var(--text-base);
-    color: var(--color-text-muted);
-    line-height: var(--leading-relaxed);
-    max-width: var(--max-prose);
-    margin-bottom: var(--space-3);
-  }
-
-  .collection-meta {
-    display: flex;
-    gap: var(--space-4);
-    align-items: center;
-    font-size: var(--text-sm);
-    color: var(--color-text-light);
-  }
-
-  .meta-location::before {
-    content: '📍 ';
   }
 
   /* Masonry grid — CSS columns */
