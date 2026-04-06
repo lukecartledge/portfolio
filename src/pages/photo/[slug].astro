@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content'
 import PhotoDetail from '@/layouts/PhotoDetail.astro'
 import Breadcrumb from '@/components/Breadcrumb.astro'
 import ExifMeta from '@/components/ExifMeta.astro'
-import { heroSrcset, imageUrl, ogImageUrl, assetDimensions } from '@/lib/image'
+import { heroSrcset, imageUrl, ogImageUrl, assetDimensions, blurPlaceholder } from '@/lib/image'
 import type { ContentfulAsset } from '@/lib/image'
 
 export async function getStaticPaths() {
@@ -32,27 +32,17 @@ const { photo, prevSlug, nextSlug } = Astro.props
 
 const image = photo.image as ContentfulAsset
 const { width, height } = assetDimensions(image)
+const blurSrc = blurPlaceholder(image)
 
 const title = photo.title as string
-const caption = photo.caption as string | undefined
 const location = photo.location as string | undefined
-const dateTaken = photo.dateTaken as string | undefined
 const camera = photo.camera as string | undefined
 const lens = photo.lens as string | undefined
 const aperture = photo.aperture as string | undefined
 const shutterSpeed = photo.shutterSpeed as string | undefined
 const iso = photo.iso as string | undefined
-const tags = photo.tags as string[] | undefined
 
 const hasExif = camera || lens || aperture || shutterSpeed || iso
-
-const formattedDate = dateTaken
-  ? new Date(dateTaken).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  : undefined
 
 const breadcrumbItems = [
   { label: 'Home', href: '/' },
@@ -61,43 +51,40 @@ const breadcrumbItems = [
 ]
 ---
 
-<PhotoDetail title={title} description={caption} ogImage={ogImageUrl(image)}>
+<PhotoDetail title={title} ogImage={ogImageUrl(image)}>
   <div class="photo-detail">
     <div class="breadcrumb-wrap container">
       <Breadcrumb items={breadcrumbItems} />
     </div>
 
     <figure class="photo-figure">
-      <img
-        src={imageUrl(image, 1920)}
-        srcset={heroSrcset(image)}
-        sizes="100vw"
-        alt={title}
-        width={width}
-        height={height}
-        loading="eager"
-        decoding="async"
-      />
+      <div class="photo-blur-wrap">
+        <img
+          class="photo-blur"
+          src={blurSrc}
+          alt=""
+          aria-hidden="true"
+          width={width}
+          height={height}
+        />
+        <img
+          class="photo-full"
+          src={imageUrl(image, 1920)}
+          srcset={heroSrcset(image)}
+          sizes="100vw"
+          alt={title}
+          width={width}
+          height={height}
+          loading="eager"
+          decoding="async"
+        />
+      </div>
     </figure>
 
     <div class="photo-info">
       <h1 class="photo-title">{title}</h1>
 
-      {
-        (location || formattedDate) && (
-          <p class="photo-meta">
-            {location && <span class="photo-location">{location}</span>}
-            {location && formattedDate && (
-              <span class="photo-meta-sep" aria-hidden="true">
-                ·
-              </span>
-            )}
-            {formattedDate && <time datetime={dateTaken}>{formattedDate}</time>}
-          </p>
-        )
-      }
-
-      {caption && <p class="photo-caption">{caption}</p>}
+      {location && <p class="photo-location">{location}</p>}
 
       {
         hasExif && (
@@ -110,8 +97,6 @@ const breadcrumbItems = [
           />
         )
       }
-
-      {tags && tags.length > 0 && <p class="photo-tags">{tags.join(', ')}</p>}
     </div>
 
     {
@@ -139,6 +124,21 @@ const breadcrumbItems = [
   </div>
 </PhotoDetail>
 
+<script is:inline>
+  ;(function () {
+    const imgs = document.querySelectorAll('.photo-full')
+    imgs.forEach(function (img) {
+      if (img.complete) {
+        img.classList.add('loaded')
+      } else {
+        img.addEventListener('load', function () {
+          img.classList.add('loaded')
+        })
+      }
+    })
+  })()
+</script>
+
 <style>
   .photo-detail {
     display: flex;
@@ -150,7 +150,7 @@ const breadcrumbItems = [
     padding-block: var(--space-4) var(--space-6);
   }
 
-  /* Hero figure — full bleed */
+  /* Hero figure — full bleed with blur-up */
   .photo-figure {
     width: 100%;
     margin: 0;
@@ -158,12 +158,40 @@ const breadcrumbItems = [
     line-height: 0;
   }
 
-  .photo-figure img {
+  .photo-blur-wrap {
+    position: relative;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .photo-blur {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(20px);
+    transform: scale(1.1);
+    z-index: 1;
+  }
+
+  .photo-full {
+    position: relative;
     width: 100%;
     height: auto;
     display: block;
     max-height: 90vh;
     object-fit: contain;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity var(--duration-slow) var(--ease-out);
+  }
+
+  .photo-full.loaded {
+    opacity: 1;
   }
 
   /* Info section — centered column */
@@ -178,39 +206,19 @@ const breadcrumbItems = [
     gap: var(--space-4);
   }
 
-  /* Title */
+  /* Title — lighter weight */
   .photo-title {
     font-family: var(--font-heading);
     font-size: var(--text-2xl);
     line-height: var(--leading-snug);
-    font-weight: 700;
-    color: var(--color-text);
-  }
-
-  /* Location · Date */
-  .photo-meta {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: var(--text-sm);
+    font-weight: 400;
     color: var(--color-text-muted);
   }
 
-  .photo-meta-sep {
-    color: var(--color-border);
-  }
-
-  /* Caption */
-  .photo-caption {
-    font-size: var(--text-base);
-    line-height: var(--leading-relaxed);
-    color: var(--color-text);
-  }
-
-  /* Tags */
-  .photo-tags {
+  /* Location */
+  .photo-location {
     font-size: var(--text-sm);
-    color: var(--color-text-muted);
+    color: var(--color-text-light);
   }
 
   /* Prev/Next navigation */
@@ -232,7 +240,7 @@ const breadcrumbItems = [
     align-items: center;
     gap: var(--space-2);
     font-size: var(--text-sm);
-    color: var(--color-text-muted);
+    color: var(--color-text-light);
     text-decoration: none;
     transition:
       color var(--duration-fast) var(--ease-out),
@@ -240,7 +248,7 @@ const breadcrumbItems = [
   }
 
   .photo-nav-link:hover {
-    color: var(--color-text);
+    color: var(--color-text-muted);
     text-decoration: none;
   }
 
