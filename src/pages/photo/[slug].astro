@@ -3,12 +3,7 @@ import { getCollection } from 'astro:content'
 import PhotoDetail from '@/layouts/PhotoDetail.astro'
 import Breadcrumb from '@/components/Breadcrumb.astro'
 import ExifMeta from '@/components/ExifMeta.astro'
-import {
-  heroSrcset,
-  imageUrl,
-  ogImageUrl,
-  assetDimensions,
-} from '@/lib/image'
+import { heroSrcset, imageUrl, ogImageUrl, assetDimensions } from '@/lib/image'
 import type { ContentfulAsset } from '@/lib/image'
 
 export async function getStaticPaths() {
@@ -92,7 +87,11 @@ const breadcrumbItems = [
         (location || formattedDate) && (
           <p class="photo-meta">
             {location && <span class="photo-location">{location}</span>}
-            {location && formattedDate && <span class="photo-meta-sep" aria-hidden="true">·</span>}
+            {location && formattedDate && (
+              <span class="photo-meta-sep" aria-hidden="true">
+                ·
+              </span>
+            )}
             {formattedDate && <time datetime={dateTaken}>{formattedDate}</time>}
           </p>
         )
@@ -100,21 +99,19 @@ const breadcrumbItems = [
 
       {caption && <p class="photo-caption">{caption}</p>}
 
-      {hasExif && (
-        <ExifMeta
-          camera={camera}
-          lens={lens}
-          aperture={aperture}
-          shutterSpeed={shutterSpeed}
-          iso={iso}
-        />
-      )}
-
       {
-        tags && tags.length > 0 && (
-          <p class="photo-tags">{tags.join(', ')}</p>
+        hasExif && (
+          <ExifMeta
+            camera={camera}
+            lens={lens}
+            aperture={aperture}
+            shutterSpeed={shutterSpeed}
+            iso={iso}
+          />
         )
       }
+
+      {tags && tags.length > 0 && <p class="photo-tags">{tags.join(', ')}</p>}
     </div>
 
     {

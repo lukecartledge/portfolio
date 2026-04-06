@@ -12,38 +12,28 @@ const { items } = Astro.props
 ---
 
 <nav aria-label="Breadcrumb">
-  <ol
-    class="breadcrumb"
-    itemscope
-    itemtype="https://schema.org/BreadcrumbList"
-  >
-    {items.map((item, index) => (
-      <li
-        class="breadcrumb-item"
-        itemprop="itemListElement"
-        itemscope
-        itemtype="https://schema.org/ListItem"
-      >
-        {item.href ? (
-          <a
-            class="breadcrumb-link"
-            href={item.href}
-            itemprop="item"
-          >
-            <span itemprop="name">{item.label}</span>
-          </a>
-        ) : (
-          <span
-            class="breadcrumb-current"
-            aria-current="page"
-            itemprop="name"
-          >
-            {item.label}
-          </span>
-        )}
-        <meta itemprop="position" content={String(index + 1)} />
-      </li>
-    ))}
+  <ol class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
+    {
+      items.map((item, index) => (
+        <li
+          class="breadcrumb-item"
+          itemprop="itemListElement"
+          itemscope
+          itemtype="https://schema.org/ListItem"
+        >
+          {item.href ? (
+            <a class="breadcrumb-link" href={item.href} itemprop="item">
+              <span itemprop="name">{item.label}</span>
+            </a>
+          ) : (
+            <span class="breadcrumb-current" aria-current="page" itemprop="name">
+              {item.label}
+            </span>
+          )}
+          <meta itemprop="position" content={String(index + 1)} />
+        </li>
+      ))
+    }
   </ol>
 </nav>
 

@@ -19,19 +19,21 @@ const rows: { label: string; value: string | undefined }[] = [
   { label: 'Focal Length', value: focalLength },
 ]
 
-const visibleRows = rows.filter(row => row.value !== undefined && row.value !== '')
+const visibleRows = rows.filter((row) => row.value !== undefined && row.value !== '')
 ---
 
-{visibleRows.length > 0 && (
-  <dl class="exif-meta">
-    {visibleRows.map(row => (
-      <div class="exif-row">
-        <dt class="exif-label">{row.label}</dt>
-        <dd class="exif-value">{row.value}</dd>
-      </div>
-    ))}
-  </dl>
-)}
+{
+  visibleRows.length > 0 && (
+    <dl class="exif-meta">
+      {visibleRows.map((row) => (
+        <div class="exif-row">
+          <dt class="exif-label">{row.label}</dt>
+          <dd class="exif-value">{row.value}</dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
 
 <style>
   .exif-meta {
