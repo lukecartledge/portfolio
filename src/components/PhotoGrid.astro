@@ -19,7 +19,12 @@ const { photos } = Astro.props
   {
     photos.map((photo, index) => (
       <div class="gallery-grid-item">
-        <PhotoCard image={photo.image} title={photo.title} loading={index < 6 ? 'eager' : 'lazy'} />
+        <PhotoCard
+          image={photo.image}
+          title={photo.title}
+          loading={index < 3 ? 'eager' : 'lazy'}
+          fetchpriority={index === 0 ? 'high' : undefined}
+        />
       </div>
     ))
   }

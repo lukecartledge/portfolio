@@ -7,9 +7,10 @@ interface Props {
   slug: string
   coverImage: ContentfulAsset
   description?: string
+  loading?: 'lazy' | 'eager'
 }
 
-const { title, slug, coverImage, description } = Astro.props
+const { title, slug, coverImage, description, loading = 'lazy' } = Astro.props
 
 const src = imageUrl(coverImage, 800, 75)
 const srcset = masonrySrcset(coverImage)
@@ -25,7 +26,7 @@ const { width, height } = assetDimensions(coverImage)
       alt={description ?? title}
       width={width}
       height={height}
-      loading="lazy"
+      loading={loading}
       decoding="async"
       class="collection-card-img"
     />

@@ -7,9 +7,10 @@ interface Props {
   title: string
   href?: string
   loading?: 'lazy' | 'eager'
+  fetchpriority?: 'high' | 'low' | 'auto'
 }
 
-const { image, title, href, loading = 'lazy' } = Astro.props
+const { image, title, href, loading = 'lazy', fetchpriority } = Astro.props
 
 const src = imageUrl(image, 600, 75)
 const srcset = masonrySrcset(image)
@@ -29,6 +30,7 @@ const displayHeight = Math.round(displayWidth * (naturalHeight / naturalWidth))
     height={displayHeight}
     loading={loading}
     decoding="async"
+    fetchpriority={fetchpriority}
   />
   <div class="photo-overlay">
     <span class="photo-title">{title}</span>
