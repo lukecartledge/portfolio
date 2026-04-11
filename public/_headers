@@ -1,0 +1,17 @@
+# Immutable hashed assets (Astro output)
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts — long-lived, versioned by filename
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Static images (favicon, OG default)
+/favicon.svg
+  Cache-Control: public, max-age=86400
+/favicon.ico
+  Cache-Control: public, max-age=86400
+/apple-touch-icon.png
+  Cache-Control: public, max-age=86400
+/og-default.jpg
+  Cache-Control: public, max-age=86400
