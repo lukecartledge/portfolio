@@ -2,7 +2,8 @@
 import { getCollection } from 'astro:content'
 import Page from '@/layouts/Page.astro'
 import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
-import { imageUrl, ogImageUrl } from '@/lib/image'
+import { imageUrl, ogImageUrl, blurPlaceholder, assetDimensions } from '@/lib/image'
+import type { ContentfulAsset } from '@/lib/image'
 
 const siteConfigEntries = await getCollection('siteConfig')
 const config = siteConfigEntries[0]?.data
@@ -14,67 +15,335 @@ if (!config) {
 const title = `About — ${config.title}`
 const description = config.seo?.metaDescription ?? config.tagline
 
-const profileSrc = config.profileImage ? imageUrl(config.profileImage, 480, 80) : undefined
-const ogImage = config.profileImage ? ogImageUrl(config.profileImage) : undefined
+const profileImage = config.profileImage as ContentfulAsset | undefined
+const ogImage = profileImage ? ogImageUrl(profileImage) : undefined
+
+// Responsive portrait srcset — serves appropriately sized images
+const portraitSizes = [400, 600, 800, 1200, 1600]
+const portraitSrcset = profileImage
+  ? portraitSizes.map((w) => `${imageUrl(profileImage, w, 80)} ${w}w`).join(', ')
+  : undefined
+const portraitSrc = profileImage ? imageUrl(profileImage, 800, 80) : undefined
+const portraitBlur = profileImage ? blurPlaceholder(profileImage) : undefined
+const portraitDims = profileImage ? assetDimensions(profileImage) : undefined
+
+// Bio from rich text
+const bioHtml = config.bio ? documentToHtmlString(config.bio) : undefined
+
+// New optional fields — graceful fallback when not yet in CMS
+const location = (config.location as string) ?? undefined
+const journeyHtml = config.photographyJourney
+  ? documentToHtmlString(config.photographyJourney)
+  : undefined
+const equipmentHtml = config.equipment ? documentToHtmlString(config.equipment) : undefined
+
+// Social links
+const labels: Record<string, string> = {
+  instagram: 'Instagram',
+  github: 'GitHub',
+  email: 'Email',
+}
+const rawLinks = (config.socialLinks ?? {}) as Record<string, string>
+const socialLinks = Object.entries(rawLinks)
+  .filter(([, url]) => typeof url === 'string' && url.length > 0)
+  .map(([platform, url]) => ({
+    platform,
+    url,
+    label: labels[platform] ?? platform,
+  }))
+
+const icons: Record<string, string> = {
+  instagram: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`,
+  email: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,4 12,13 2,4"/></svg>`,
+  github: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>`,
+}
 ---
 
 <Page title={title} description={description} ogImage={ogImage}>
-  <section class="about container">
-    {
-      profileSrc && (
-        <div class="about-portrait">
+  {/* Hero — full-width portrait with text overlay */}
+  {
+    portraitSrc && portraitDims && (
+      <section class="about-hero">
+        <div class="about-hero-image">
           <img
-            src={profileSrc}
-            alt={config.title}
-            width="480"
-            height="480"
+            src={portraitSrc}
+            srcset={portraitSrcset}
+            sizes="100vw"
+            alt={`${config.title} — portrait`}
+            width={portraitDims.width}
+            height={portraitDims.height}
             loading="eager"
             decoding="async"
+            fetchpriority="high"
+            style={
+              portraitBlur
+                ? `background-image: url(${portraitBlur}); background-size: cover;`
+                : undefined
+            }
           />
         </div>
-      )
-    }
-    <div class="about-content prose">
-      {config.bio && <Fragment set:html={documentToHtmlString(config.bio)} />}
-    </div>
-  </section>
+        <div class="about-hero-overlay">
+          <h1 class="about-hero-name">{config.title}</h1>
+          {config.tagline && <p class="about-hero-tagline">{config.tagline}</p>}
+          {location && <p class="about-hero-location">{location}</p>}
+        </div>
+      </section>
+    )
+  }
+
+  {/* Fallback heading when no portrait */}
+  {
+    !portraitSrc && (
+      <section class="about-heading container">
+        <h1>{config.title}</h1>
+        {config.tagline && <p class="about-tagline-fallback">{config.tagline}</p>}
+      </section>
+    )
+  }
+
+  {/* Bio */}
+  {
+    bioHtml && (
+      <section class="about-section container">
+        <div class="prose" set:html={bioHtml} />
+      </section>
+    )
+  }
+
+  {/* Photography Journey */}
+  {
+    journeyHtml && (
+      <section class="about-section container">
+        <h2 class="section-heading">The Journey</h2>
+        <div class="prose" set:html={journeyHtml} />
+      </section>
+    )
+  }
+
+  {/* Equipment */}
+  {
+    equipmentHtml && (
+      <section class="about-section container">
+        <h2 class="section-heading">Equipment</h2>
+        <div class="prose equipment-list" set:html={equipmentHtml} />
+      </section>
+    )
+  }
+
+  {/* Social / Connect */}
+  {
+    socialLinks.length > 0 && (
+      <section class="about-connect container">
+        <h2 class="section-heading">Connect</h2>
+        <div class="social-links">
+          {socialLinks.map((link) => (
+            <a
+              href={link.url}
+              class="social-link"
+              target={link.platform !== 'email' ? '_blank' : undefined}
+              rel={link.platform !== 'email' ? 'noopener noreferrer' : undefined}
+            >
+              <span class="social-link-icon" set:html={icons[link.platform]} />
+              <span class="social-link-label">{link.label}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )
+  }
 </Page>
 
 <style>
-  .about {
-    padding-block: var(--space-12) var(--space-24);
-    display: grid;
-    gap: var(--space-12);
+  /* === Hero === */
+  .about-hero {
+    position: relative;
+    width: 100%;
+    max-height: 70vh;
+    overflow: hidden;
+  }
+
+  .about-hero-image {
+    width: 100%;
+  }
+
+  .about-hero-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 70vh;
+    object-fit: cover;
+    object-position: center 30%;
+  }
+
+  .about-hero-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--space-8);
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.2) 50%,
+      transparent 100%
+    );
+  }
+
+  .about-hero-name {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: #ffffff;
+    line-height: var(--leading-tight);
+    letter-spacing: 0.01em;
+  }
+
+  .about-hero-tagline {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: var(--space-2);
+    line-height: var(--leading-normal);
+  }
+
+  .about-hero-location {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.65);
+    margin-top: var(--space-1);
+    letter-spacing: var(--nav-letter-spacing);
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 768px) {
+    .about-hero-overlay {
+      padding: var(--space-16);
+    }
+
+    .about-hero-name {
+      font-size: var(--text-4xl);
+    }
+
+    .about-hero-tagline {
+      font-size: var(--text-lg);
+    }
+  }
+
+  /* === Fallback heading (no portrait) === */
+  .about-heading {
+    padding-block: var(--space-16) var(--space-8);
+    text-align: center;
+  }
+
+  .about-tagline-fallback {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    margin-top: var(--space-3);
+  }
+
+  /* === Sections === */
+  .about-section {
+    padding-block: var(--space-12);
     max-width: var(--max-prose);
     margin-inline: auto;
   }
 
-  .about-portrait {
-    max-width: 280px;
+  .about-section:first-of-type {
+    padding-top: var(--space-16);
   }
 
-  .about-portrait img {
-    width: 100%;
-    height: auto;
-    display: block;
+  .section-heading {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: var(--space-6);
+    letter-spacing: 0.01em;
   }
 
-  .about-content :global(p) {
+  /* === Prose (shared rich text styles) === */
+  .prose :global(p) {
     font-size: var(--text-base);
     line-height: var(--leading-relaxed);
     color: var(--color-text);
   }
 
-  .about-content :global(p + p) {
+  .prose :global(p + p) {
     margin-top: var(--space-4);
   }
 
+  .prose :global(h3) {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-6);
+  }
+
+  .prose :global(li) {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .prose :global(li + li) {
+    margin-top: var(--space-1);
+  }
+
+  .prose :global(strong) {
+    font-weight: 600;
+  }
+
+  /* === Equipment list — two columns on desktop === */
   @media (min-width: 768px) {
-    .about {
-      grid-template-columns: 280px 1fr;
-      align-items: start;
-      max-width: var(--max-content);
-      padding-block: var(--space-16) var(--space-32);
+    .equipment-list :global(ul) {
+      columns: 2;
+      column-gap: var(--space-8);
     }
+  }
+
+  /* === Connect / Social === */
+  .about-connect {
+    padding-block: var(--space-12) var(--space-24);
+    max-width: var(--max-prose);
+    margin-inline: auto;
+  }
+
+  .social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+  }
+
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    text-decoration: none;
+    color: var(--color-text-muted);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .social-link:hover {
+    color: var(--color-text);
+  }
+
+  .social-link-icon {
+    display: inline-flex;
+  }
+
+  .social-link-label {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    letter-spacing: var(--nav-letter-spacing);
+    text-transform: uppercase;
   }
 </style>
