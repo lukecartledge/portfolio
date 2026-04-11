@@ -40,12 +40,13 @@ const ogImage = prepared[0]?.coverImage ? ogImageUrl(prepared[0].coverImage) : u
         <p class="empty-message">No collections yet.</p>
       ) : (
         <div class="collections-grid">
-          {prepared.map((item) => (
+          {prepared.map((item, index) => (
             <CollectionCard
               title={item.title}
               slug={item.slug}
               coverImage={item.coverImage}
               description={item.description}
+              loading={index < 2 ? 'eager' : 'lazy'}
             />
           ))}
         </div>

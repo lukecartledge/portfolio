@@ -19,6 +19,7 @@ export async function getStaticPaths() {
 const { collection } = Astro.props
 
 const title = collection.title as string
+const description = (collection.description as string) ?? undefined
 
 const coverPhotoRef = collection.coverPhoto as { fields: Record<string, unknown> }
 const coverImage = coverPhotoRef.fields.image as ContentfulAsset
@@ -45,7 +46,7 @@ const breadcrumb = [
 const ogImage = ogImageUrl(coverImage)
 ---
 
-<Page title={`${title} — Photography — Luke Cartledge`} ogImage={ogImage}>
+<Page title={`${title} — Photography — Luke Cartledge`} description={description} ogImage={ogImage}>
   <section class="collection container">
     <Breadcrumb items={breadcrumb} />
 
