@@ -13,7 +13,8 @@ if (!config) {
 }
 
 const title = `About — ${config.title}`
-const description = config.seo?.metaDescription ?? config.tagline
+const seo = config.seo as { title?: string; description?: string } | undefined
+const description = seo?.description ?? config.tagline
 
 const profileImage = config.profileImage as ContentfulAsset | undefined
 const ogImage = profileImage ? ogImageUrl(profileImage) : undefined

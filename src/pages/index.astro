@@ -60,8 +60,9 @@ if (featuredRefs.length > 0) {
 }
 
 const heroPhoto = featuredRefs[0]
-const title = config.seo?.metaTitle ?? `${config.title} — ${config.tagline}`
-const description = config.seo?.metaDescription ?? config.tagline
+const seo = config.seo as { title?: string; description?: string } | undefined
+const title = seo?.title ?? `${config.title} — ${config.tagline}`
+const description = seo?.description ?? config.tagline
 const ogImage = heroPhoto?.fields?.image
   ? ogImageUrl(heroPhoto.fields.image as ContentfulAsset)
   : undefined
