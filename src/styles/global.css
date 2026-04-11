@@ -124,6 +124,34 @@ h6 {
   --duration-slow: 600ms;
 }
 
+/* === Dark Mode === */
+
+/* System preference (no explicit choice stored) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: #0a0a0a;
+    --color-bg-alt: #141414;
+    --color-text: #e0e0e0;
+    --color-text-muted: #b0b0b0;
+    --color-text-light: #777777;
+    --color-accent: #e0e0e0;
+    --color-border: #2a2a2a;
+    --color-overlay: rgba(0, 0, 0, 0.9);
+  }
+}
+
+/* Explicit dark choice */
+:root[data-theme='dark'] {
+  --color-bg: #0a0a0a;
+  --color-bg-alt: #141414;
+  --color-text: #e0e0e0;
+  --color-text-muted: #b0b0b0;
+  --color-text-light: #777777;
+  --color-accent: #e0e0e0;
+  --color-border: #2a2a2a;
+  --color-overlay: rgba(0, 0, 0, 0.9);
+}
+
 /* === Base Element Styles === */
 
 body {
@@ -132,6 +160,9 @@ body {
   line-height: var(--leading-normal);
   color: var(--color-text);
   background-color: var(--color-bg);
+  transition:
+    background-color var(--duration-normal) var(--ease-out),
+    color var(--duration-normal) var(--ease-out);
 }
 
 h1,

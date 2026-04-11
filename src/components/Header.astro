@@ -1,4 +1,6 @@
 ---
+import ThemeToggle from '@/components/ThemeToggle.astro'
+
 type SocialLink = {
   platform: 'instagram' | 'email' | 'github'
   url: string
@@ -48,6 +50,7 @@ const navLinks = [
           </a>
         ))
       }
+      <ThemeToggle />
     </nav>
 
     <label class="hamburger" for="mobile-nav-toggle" aria-label="Open menu">
@@ -119,6 +122,9 @@ const navLinks = [
           </a>
         ))
       }
+    </div>
+    <div class="mobile-nav-theme">
+      <ThemeToggle />
     </div>
   </nav>
 </div>
@@ -258,6 +264,10 @@ const navLinks = [
     display: flex;
     gap: var(--space-4);
     margin-top: auto;
+  }
+
+  .mobile-nav-theme {
+    padding-top: var(--space-4);
   }
 
   .mobile-nav-checkbox:checked ~ .mobile-nav-overlay {

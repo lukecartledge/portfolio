@@ -20,5 +20,89 @@ const { title, description, ogImage } = Astro.props
   <body>
     <a href="#main" class="visually-hidden">Skip to content</a>
     <slot />
+    <script is:inline>
+      ;(function () {
+        if (window.__themeToggleInit) return
+        window.__themeToggleInit = true
+
+        const STORAGE_KEY = 'theme'
+
+        function getStoredTheme() {
+          try {
+            return localStorage.getItem(STORAGE_KEY)
+          } catch {
+            return null
+          }
+        }
+
+        function getSystemTheme() {
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+
+        function getEffectiveTheme() {
+          const stored = getStoredTheme()
+          if (stored === 'light' || stored === 'dark') return stored
+          return getSystemTheme()
+        }
+
+        function applyTheme(theme) {
+          if (theme === 'light' || theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', theme)
+          } else {
+            document.documentElement.removeAttribute('data-theme')
+          }
+          updateUI()
+        }
+
+        function updateUI() {
+          const effective = getEffectiveTheme()
+          const label = effective === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'
+          document.querySelectorAll('.theme-toggle').forEach(function (btn) {
+            btn.setAttribute('aria-label', label)
+          })
+          document.documentElement.setAttribute('data-effective-theme', effective)
+        }
+
+        document.addEventListener('click', function (e) {
+          const btn = e.target.closest('.theme-toggle')
+          if (!btn) return
+
+          const stored = getStoredTheme()
+          let next
+
+          if (stored === null || stored === 'system') {
+            next = getSystemTheme() === 'dark' ? 'light' : 'dark'
+          } else if (stored === 'dark') {
+            next = 'light'
+          } else {
+            next = getSystemTheme() === 'light' ? 'dark' : 'system'
+          }
+
+          if (next === 'system') {
+            try {
+              localStorage.removeItem(STORAGE_KEY)
+            } catch {
+              /* localStorage unavailable */
+            }
+          } else {
+            try {
+              localStorage.setItem(STORAGE_KEY, next)
+            } catch {
+              /* localStorage unavailable */
+            }
+          }
+
+          applyTheme(next)
+        })
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+          if (!getStoredTheme()) {
+            updateUI()
+          }
+        })
+
+        updateUI()
+      })()
+    </script>
   </body>
 </html>
