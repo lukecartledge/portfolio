@@ -107,163 +107,183 @@ const lightboxData = photos.map((p) => {
 </div>
 
 <script is:inline define:vars={{ lightboxData }}>
-  const lightbox = document.getElementById('lightbox')
-  const lightboxImg = document.getElementById('lightbox-image')
-  const lightboxWrap = document.getElementById('lightbox-image-wrap')
-  const lightboxCaptionTitle = document.getElementById('lightbox-caption-title')
-  const lightboxCaptionLocation = document.getElementById('lightbox-caption-location')
-  const lightboxCaptionExif = document.getElementById('lightbox-caption-exif')
-  let currentIndex = -1
+  // Store current page's lightbox data globally so it stays current
+  window.__lightboxData = lightboxData
 
-  const LIGHTBOX_SIZES_ATTR =
-    '(max-aspect-ratio: 3/4) min(90vw, calc(80vh * 0.75)), min(90vw, calc(80vh * 1.5))'
+  ;(function () {
+    // Only set up global listeners once
+    if (window.__lightboxInit) return
+    window.__lightboxInit = true
 
-  function preloadAdjacentImages(index) {
-    const indices = [index - 1, index + 1]
-    indices.forEach(function (i) {
-      if (i < 0 || i >= lightboxData.length) return
-      if (document.querySelector('link[data-lightbox-preload="' + i + '"]')) return
-      const link = document.createElement('link')
-      link.rel = 'preload'
-      link.as = 'image'
-      link.href = lightboxData[i].src
-      link.imageSrcset = lightboxData[i].srcset
-      link.imageSizes = LIGHTBOX_SIZES_ATTR
-      link.dataset.lightboxPreload = String(i)
-      document.head.appendChild(link)
-    })
-  }
+    var currentIndex = -1
+    var LIGHTBOX_SIZES_ATTR =
+      '(max-aspect-ratio: 3/4) min(90vw, calc(80vh * 0.75)), min(90vw, calc(80vh * 1.5))'
 
-  function openLightbox(index) {
-    if (index < 0 || index >= lightboxData.length) return
-    currentIndex = index
-    const photo = lightboxData[currentIndex]
+    function getData() {
+      return window.__lightboxData || []
+    }
 
-    // Reset image to transparent while loading
-    lightboxImg.classList.remove('is-loaded')
-
-    // Set sources — browser starts fetching
-    lightboxImg.srcset = photo.srcset
-    lightboxImg.sizes = LIGHTBOX_SIZES_ATTR
-    lightboxImg.src = photo.src
-    lightboxImg.alt = photo.title
-
-    // Show blur placeholder as background on wrapper
-    lightboxWrap.style.backgroundImage = 'url(' + photo.blur + ')'
-
-    // Use decode() to crossfade once pixels are ready
-    const capturedIndex = index
-    lightboxImg
-      .decode()
-      .then(function () {
-        if (currentIndex === capturedIndex) {
-          lightboxImg.classList.add('is-loaded')
-        }
+    function preloadAdjacentImages(index) {
+      var data = getData()
+      var indices = [index - 1, index + 1]
+      indices.forEach(function (i) {
+        if (i < 0 || i >= data.length) return
+        if (document.querySelector('link[data-lightbox-preload="' + i + '"]')) return
+        var link = document.createElement('link')
+        link.rel = 'preload'
+        link.as = 'image'
+        link.href = data[i].src
+        link.imageSrcset = data[i].srcset
+        link.imageSizes = LIGHTBOX_SIZES_ATTR
+        link.dataset.lightboxPreload = String(i)
+        document.head.appendChild(link)
       })
-      .catch(function () {
-        // Show image anyway on decode failure
-        if (currentIndex === capturedIndex) {
-          lightboxImg.classList.add('is-loaded')
-        }
+    }
+
+    function openLightbox(index) {
+      var data = getData()
+      if (index < 0 || index >= data.length) return
+      currentIndex = index
+      var photo = data[currentIndex]
+
+      var lightbox = document.getElementById('lightbox')
+      var lightboxImg = document.getElementById('lightbox-image')
+      var lightboxWrap = document.getElementById('lightbox-image-wrap')
+      var lightboxCaptionTitle = document.getElementById('lightbox-caption-title')
+      var lightboxCaptionLocation = document.getElementById('lightbox-caption-location')
+      var lightboxCaptionExif = document.getElementById('lightbox-caption-exif')
+      if (!lightbox || !lightboxImg) return
+
+      lightboxImg.classList.remove('is-loaded')
+      lightboxImg.srcset = photo.srcset
+      lightboxImg.sizes = LIGHTBOX_SIZES_ATTR
+      lightboxImg.src = photo.src
+      lightboxImg.alt = photo.title
+
+      lightboxWrap.style.backgroundImage = 'url(' + photo.blur + ')'
+
+      var capturedIndex = index
+      lightboxImg
+        .decode()
+        .then(function () {
+          if (currentIndex === capturedIndex) {
+            lightboxImg.classList.add('is-loaded')
+          }
+        })
+        .catch(function () {
+          if (currentIndex === capturedIndex) {
+            lightboxImg.classList.add('is-loaded')
+          }
+        })
+
+      lightboxCaptionTitle.textContent = photo.title
+      lightboxCaptionLocation.textContent = photo.location
+      lightboxCaptionLocation.style.display = photo.location ? '' : 'none'
+      lightboxCaptionExif.textContent = photo.exif
+      lightboxCaptionExif.style.display = photo.exif ? '' : 'none'
+      lightbox.classList.add('is-open')
+      lightbox.setAttribute('aria-hidden', 'false')
+      document.body.style.overflow = 'hidden'
+      preloadAdjacentImages(index)
+    }
+
+    function closeLightbox() {
+      var lightbox = document.getElementById('lightbox')
+      if (!lightbox) return
+      lightbox.classList.remove('is-open')
+      lightbox.setAttribute('aria-hidden', 'true')
+      document.body.style.overflow = ''
+      currentIndex = -1
+      document.querySelectorAll('link[data-lightbox-preload]').forEach(function (el) {
+        el.remove()
       })
+    }
 
-    lightboxCaptionTitle.textContent = photo.title
-    lightboxCaptionLocation.textContent = photo.location
-    lightboxCaptionLocation.style.display = photo.location ? '' : 'none'
-    lightboxCaptionExif.textContent = photo.exif
-    lightboxCaptionExif.style.display = photo.exif ? '' : 'none'
-    lightbox.classList.add('is-open')
-    lightbox.setAttribute('aria-hidden', 'false')
-    document.body.style.overflow = 'hidden'
-    preloadAdjacentImages(index)
-  }
+    function showPrev() {
+      if (currentIndex > 0) openLightbox(currentIndex - 1)
+    }
 
-  function closeLightbox() {
-    lightbox.classList.remove('is-open')
-    lightbox.setAttribute('aria-hidden', 'true')
-    document.body.style.overflow = ''
-    currentIndex = -1
-    document.querySelectorAll('link[data-lightbox-preload]').forEach(function (el) {
-      el.remove()
+    function showNext() {
+      var data = getData()
+      if (currentIndex < data.length - 1) openLightbox(currentIndex + 1)
+    }
+
+    // Use event delegation for photo-card clicks (survives DOM swaps)
+    document.addEventListener('click', function (e) {
+      var card = e.target.closest('.photo-card')
+      if (!card) return
+      var cards = Array.from(document.querySelectorAll('.photo-card'))
+      var index = cards.indexOf(card)
+      if (index !== -1) openLightbox(index)
     })
-  }
 
-  function showPrev() {
-    if (currentIndex > 0) openLightbox(currentIndex - 1)
-  }
-
-  function showNext() {
-    if (currentIndex < lightboxData.length - 1) openLightbox(currentIndex + 1)
-  }
-
-  document.querySelectorAll('.photo-card').forEach(function (card, i) {
-    card.addEventListener('click', function () {
-      openLightbox(i)
+    // Lightbox close buttons — use delegation on lightbox container
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('[data-lightbox-close]')) closeLightbox()
+      if (e.target.closest('[data-lightbox-prev]')) showPrev()
+      if (e.target.closest('[data-lightbox-next]')) showNext()
     })
-  })
 
-  document.querySelectorAll('[data-lightbox-close]').forEach(function (el) {
-    el.addEventListener('click', closeLightbox)
-  })
-
-  document.querySelector('[data-lightbox-prev]')?.addEventListener('click', showPrev)
-  document.querySelector('[data-lightbox-next]')?.addEventListener('click', showNext)
-
-  document.addEventListener('keydown', function (e) {
-    if (currentIndex === -1) return
-    if (e.key === 'Escape') closeLightbox()
-    if (e.key === 'ArrowLeft') showPrev()
-    if (e.key === 'ArrowRight') showNext()
-  })
-
-  // Touch swipe navigation for mobile
-  let touchStartX = 0
-  let touchStartY = 0
-  let isSwiping = false
-  const SWIPE_THRESHOLD = 50
-
-  lightbox.addEventListener(
-    'touchstart',
-    function (e) {
+    document.addEventListener('keydown', function (e) {
       if (currentIndex === -1) return
-      touchStartX = e.touches[0].clientX
-      touchStartY = e.touches[0].clientY
-      isSwiping = true
-    },
-    { passive: true },
-  )
+      if (e.key === 'Escape') closeLightbox()
+      if (e.key === 'ArrowLeft') showPrev()
+      if (e.key === 'ArrowRight') showNext()
+    })
 
-  lightbox.addEventListener(
-    'touchmove',
-    function (e) {
-      if (!isSwiping) return
-      const dx = Math.abs(e.touches[0].clientX - touchStartX)
-      const dy = Math.abs(e.touches[0].clientY - touchStartY)
-      // If vertical scroll intent, cancel swipe detection
-      if (dy > dx) {
-        isSwiping = false
-      }
-    },
-    { passive: true },
-  )
+    // Touch swipe navigation for mobile
+    var touchStartX = 0
+    var touchStartY = 0
+    var isSwiping = false
+    var SWIPE_THRESHOLD = 50
 
-  lightbox.addEventListener(
-    'touchend',
-    function (e) {
-      if (!isSwiping || currentIndex === -1) {
+    document.addEventListener(
+      'touchstart',
+      function (e) {
+        if (currentIndex === -1) return
+        var lightbox = document.getElementById('lightbox')
+        if (!lightbox || !lightbox.contains(e.target)) return
+        touchStartX = e.touches[0].clientX
+        touchStartY = e.touches[0].clientY
+        isSwiping = true
+      },
+      { passive: true },
+    )
+
+    document.addEventListener(
+      'touchmove',
+      function (e) {
+        if (!isSwiping) return
+        var dx = Math.abs(e.touches[0].clientX - touchStartX)
+        var dy = Math.abs(e.touches[0].clientY - touchStartY)
+        if (dy > dx) {
+          isSwiping = false
+        }
+      },
+      { passive: true },
+    )
+
+    document.addEventListener(
+      'touchend',
+      function (e) {
+        if (!isSwiping || currentIndex === -1) {
+          isSwiping = false
+          return
+        }
+        var dx = e.changedTouches[0].clientX - touchStartX
+        if (dx > SWIPE_THRESHOLD) {
+          showPrev()
+        } else if (dx < -SWIPE_THRESHOLD) {
+          showNext()
+        }
         isSwiping = false
-        return
-      }
-      const dx = e.changedTouches[0].clientX - touchStartX
-      if (dx > SWIPE_THRESHOLD) {
-        showPrev()
-      } else if (dx < -SWIPE_THRESHOLD) {
-        showNext()
-      }
-      isSwiping = false
-    },
-    { passive: true },
-  )
+      },
+      { passive: true },
+    )
+
+    // Close lightbox before view transition navigation
+    document.addEventListener('astro:before-preparation', closeLightbox)
+  })()
 </script>
 
 <style>
