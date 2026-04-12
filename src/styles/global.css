@@ -265,3 +265,7 @@ img {
     animation: none !important;
   }
 }
+
+body.lightbox-active .header {
+  z-index: 1;
+}
