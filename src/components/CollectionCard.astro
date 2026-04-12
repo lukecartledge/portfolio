@@ -18,7 +18,7 @@ const { width, height } = assetDimensions(coverImage)
 ---
 
 <a class="collection-card" href={`/photography/${slug}`} aria-label={title}>
-  <div class="collection-card-media">
+  <div class="collection-card-media" transition:name={`collection-${slug}`}>
     <img
       src={src}
       srcset={srcset}
