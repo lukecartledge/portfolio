@@ -109,14 +109,13 @@ const lightboxData = photos.map((p) => {
 <script is:inline define:vars={{ lightboxData }}>
   // Store current page's lightbox data globally so it stays current
   window.__lightboxData = lightboxData
-
   ;(function () {
     // Only set up global listeners once
     if (window.__lightboxInit) return
     window.__lightboxInit = true
 
-    var currentIndex = -1
-    var LIGHTBOX_SIZES_ATTR =
+    let currentIndex = -1
+    const LIGHTBOX_SIZES_ATTR =
       '(max-aspect-ratio: 3/4) min(90vw, calc(80vh * 0.75)), min(90vw, calc(80vh * 1.5))'
 
     function getData() {
@@ -124,12 +123,12 @@ const lightboxData = photos.map((p) => {
     }
 
     function preloadAdjacentImages(index) {
-      var data = getData()
-      var indices = [index - 1, index + 1]
+      const data = getData()
+      const indices = [index - 1, index + 1]
       indices.forEach(function (i) {
         if (i < 0 || i >= data.length) return
         if (document.querySelector('link[data-lightbox-preload="' + i + '"]')) return
-        var link = document.createElement('link')
+        const link = document.createElement('link')
         link.rel = 'preload'
         link.as = 'image'
         link.href = data[i].src
@@ -141,17 +140,17 @@ const lightboxData = photos.map((p) => {
     }
 
     function openLightbox(index) {
-      var data = getData()
+      const data = getData()
       if (index < 0 || index >= data.length) return
       currentIndex = index
-      var photo = data[currentIndex]
+      const photo = data[currentIndex]
 
-      var lightbox = document.getElementById('lightbox')
-      var lightboxImg = document.getElementById('lightbox-image')
-      var lightboxWrap = document.getElementById('lightbox-image-wrap')
-      var lightboxCaptionTitle = document.getElementById('lightbox-caption-title')
-      var lightboxCaptionLocation = document.getElementById('lightbox-caption-location')
-      var lightboxCaptionExif = document.getElementById('lightbox-caption-exif')
+      const lightbox = document.getElementById('lightbox')
+      const lightboxImg = document.getElementById('lightbox-image')
+      const lightboxWrap = document.getElementById('lightbox-image-wrap')
+      const lightboxCaptionTitle = document.getElementById('lightbox-caption-title')
+      const lightboxCaptionLocation = document.getElementById('lightbox-caption-location')
+      const lightboxCaptionExif = document.getElementById('lightbox-caption-exif')
       if (!lightbox || !lightboxImg) return
 
       lightboxImg.classList.remove('is-loaded')
@@ -162,7 +161,7 @@ const lightboxData = photos.map((p) => {
 
       lightboxWrap.style.backgroundImage = 'url(' + photo.blur + ')'
 
-      var capturedIndex = index
+      const capturedIndex = index
       lightboxImg
         .decode()
         .then(function () {
@@ -188,7 +187,7 @@ const lightboxData = photos.map((p) => {
     }
 
     function closeLightbox() {
-      var lightbox = document.getElementById('lightbox')
+      const lightbox = document.getElementById('lightbox')
       if (!lightbox) return
       lightbox.classList.remove('is-open')
       lightbox.setAttribute('aria-hidden', 'true')
@@ -204,16 +203,16 @@ const lightboxData = photos.map((p) => {
     }
 
     function showNext() {
-      var data = getData()
+      const data = getData()
       if (currentIndex < data.length - 1) openLightbox(currentIndex + 1)
     }
 
     // Use event delegation for photo-card clicks (survives DOM swaps)
     document.addEventListener('click', function (e) {
-      var card = e.target.closest('.photo-card')
+      const card = e.target.closest('.photo-card')
       if (!card) return
-      var cards = Array.from(document.querySelectorAll('.photo-card'))
-      var index = cards.indexOf(card)
+      const cards = Array.from(document.querySelectorAll('.photo-card'))
+      const index = cards.indexOf(card)
       if (index !== -1) openLightbox(index)
     })
 
@@ -232,16 +231,16 @@ const lightboxData = photos.map((p) => {
     })
 
     // Touch swipe navigation for mobile
-    var touchStartX = 0
-    var touchStartY = 0
-    var isSwiping = false
-    var SWIPE_THRESHOLD = 50
+    let touchStartX = 0
+    let touchStartY = 0
+    let isSwiping = false
+    const SWIPE_THRESHOLD = 50
 
     document.addEventListener(
       'touchstart',
       function (e) {
         if (currentIndex === -1) return
-        var lightbox = document.getElementById('lightbox')
+        const lightbox = document.getElementById('lightbox')
         if (!lightbox || !lightbox.contains(e.target)) return
         touchStartX = e.touches[0].clientX
         touchStartY = e.touches[0].clientY
@@ -254,8 +253,8 @@ const lightboxData = photos.map((p) => {
       'touchmove',
       function (e) {
         if (!isSwiping) return
-        var dx = Math.abs(e.touches[0].clientX - touchStartX)
-        var dy = Math.abs(e.touches[0].clientY - touchStartY)
+        const dx = Math.abs(e.touches[0].clientX - touchStartX)
+        const dy = Math.abs(e.touches[0].clientY - touchStartY)
         if (dy > dx) {
           isSwiping = false
         }
@@ -270,7 +269,7 @@ const lightboxData = photos.map((p) => {
           isSwiping = false
           return
         }
-        var dx = e.changedTouches[0].clientX - touchStartX
+        const dx = e.changedTouches[0].clientX - touchStartX
         if (dx > SWIPE_THRESHOLD) {
           showPrev()
         } else if (dx < -SWIPE_THRESHOLD) {

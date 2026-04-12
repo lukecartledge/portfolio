@@ -33,7 +33,7 @@ const { photos } = Astro.props
 <script is:inline>
   ;(function () {
     function initGalleryReveal() {
-      var items = document.querySelectorAll('.gallery-grid-item:not(.revealed)')
+      const items = document.querySelectorAll('.gallery-grid-item:not(.revealed)')
       if (!items.length || !('IntersectionObserver' in window)) {
         items.forEach(function (el) {
           el.classList.add('revealed')
@@ -41,12 +41,12 @@ const { photos } = Astro.props
         return
       }
 
-      var staggerDelay = 80
-      var batchMap = new Map()
+      const staggerDelay = 80
+      const batchMap = new Map()
 
-      var observer = new IntersectionObserver(
+      const observer = new IntersectionObserver(
         function (entries) {
-          var toReveal = []
+          const toReveal = []
           entries.forEach(function (entry) {
             if (entry.isIntersecting) {
               toReveal.push(entry.target)
@@ -59,7 +59,7 @@ const { photos } = Astro.props
               return a.getBoundingClientRect().top - b.getBoundingClientRect().top
             })
             .forEach(function (el, i) {
-              var batch = batchMap.size
+              const batch = batchMap.size
               batchMap.set(el, batch)
               el.style.transitionDelay = i * staggerDelay + 'ms'
               requestAnimationFrame(function () {

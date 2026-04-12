@@ -135,7 +135,7 @@ const navLinks = [
     if (window.__mobileNavCloseInit) return
     window.__mobileNavCloseInit = true
     document.addEventListener('astro:before-preparation', function () {
-      var checkbox = document.getElementById('mobile-nav-toggle')
+      const checkbox = document.getElementById('mobile-nav-toggle')
       if (checkbox) checkbox.checked = false
     })
   })()
