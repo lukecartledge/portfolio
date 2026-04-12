@@ -130,6 +130,17 @@ const navLinks = [
   </nav>
 </div>
 
+<script is:inline>
+  ;(function () {
+    if (window.__mobileNavCloseInit) return
+    window.__mobileNavCloseInit = true
+    document.addEventListener('astro:before-preparation', function () {
+      var checkbox = document.getElementById('mobile-nav-toggle')
+      if (checkbox) checkbox.checked = false
+    })
+  })()
+</script>
+
 <style>
   .mobile-nav-checkbox {
     position: absolute;
