@@ -184,6 +184,8 @@ const lightboxData = photos.map((p) => {
       lightbox.setAttribute('aria-hidden', 'false')
       document.body.style.overflow = 'hidden'
       document.body.classList.add('lightbox-active')
+      const header = document.querySelector('.header')
+      if (header) header.style.visibility = 'hidden'
       preloadAdjacentImages(index)
     }
 
@@ -194,6 +196,8 @@ const lightboxData = photos.map((p) => {
       lightbox.setAttribute('aria-hidden', 'true')
       document.body.style.overflow = ''
       document.body.classList.remove('lightbox-active')
+      const header = document.querySelector('.header')
+      if (header) header.style.visibility = ''
       currentIndex = -1
       document.querySelectorAll('link[data-lightbox-preload]').forEach(function (el) {
         el.remove()
