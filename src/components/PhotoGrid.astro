@@ -75,8 +75,16 @@ const { photos } = Astro.props
       })
     }
 
+    function revealAllImmediately() {
+      document.querySelectorAll('.gallery-grid-item:not(.revealed)').forEach(function (el) {
+        el.style.transition = 'none'
+        el.classList.add('revealed')
+      })
+    }
+
     initGalleryReveal()
     document.addEventListener('astro:page-load', initGalleryReveal)
+    document.addEventListener('astro:after-swap', revealAllImmediately)
   })()
 </script>
 
