@@ -25,7 +25,7 @@ const navLinks = [
 ]
 ---
 
-<header class="header">
+<header class="header" transition:persist>
   <div class="header-inner container">
     <a href="/" class="site-name">Luke Cartledge</a>
 
@@ -79,8 +79,9 @@ const navLinks = [
   class="mobile-nav-checkbox"
   aria-hidden="true"
   tabindex="-1"
+  transition:persist
 />
-<div class="mobile-nav-overlay" aria-hidden="true">
+<div class="mobile-nav-overlay" aria-hidden="true" transition:persist>
   <label class="mobile-nav-overlay-bg" for="mobile-nav-toggle"></label>
   <nav class="mobile-nav-panel" aria-label="Mobile navigation">
     <label class="mobile-nav-close" for="mobile-nav-toggle" aria-label="Close menu">
