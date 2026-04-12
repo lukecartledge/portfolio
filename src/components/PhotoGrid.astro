@@ -32,46 +32,51 @@ const { photos } = Astro.props
 
 <script is:inline>
   ;(function () {
-    const items = document.querySelectorAll('.gallery-grid-item')
-    if (!items.length || !('IntersectionObserver' in window)) {
+    function initGalleryReveal() {
+      var items = document.querySelectorAll('.gallery-grid-item:not(.revealed)')
+      if (!items.length || !('IntersectionObserver' in window)) {
+        items.forEach(function (el) {
+          el.classList.add('revealed')
+        })
+        return
+      }
+
+      var staggerDelay = 80
+      var batchMap = new Map()
+
+      var observer = new IntersectionObserver(
+        function (entries) {
+          var toReveal = []
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              toReveal.push(entry.target)
+              observer.unobserve(entry.target)
+            }
+          })
+
+          toReveal
+            .sort(function (a, b) {
+              return a.getBoundingClientRect().top - b.getBoundingClientRect().top
+            })
+            .forEach(function (el, i) {
+              var batch = batchMap.size
+              batchMap.set(el, batch)
+              el.style.transitionDelay = i * staggerDelay + 'ms'
+              requestAnimationFrame(function () {
+                el.classList.add('revealed')
+              })
+            })
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
+      )
+
       items.forEach(function (el) {
-        el.classList.add('revealed')
+        observer.observe(el)
       })
-      return
     }
 
-    const staggerDelay = 80
-    const batchMap = new Map()
-
-    const observer = new IntersectionObserver(
-      function (entries) {
-        const toReveal = []
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            toReveal.push(entry.target)
-            observer.unobserve(entry.target)
-          }
-        })
-
-        toReveal
-          .sort(function (a, b) {
-            return a.getBoundingClientRect().top - b.getBoundingClientRect().top
-          })
-          .forEach(function (el, i) {
-            const batch = batchMap.size
-            batchMap.set(el, batch)
-            el.style.transitionDelay = i * staggerDelay + 'ms'
-            requestAnimationFrame(function () {
-              el.classList.add('revealed')
-            })
-          })
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
-    )
-
-    items.forEach(function (el) {
-      observer.observe(el)
-    })
+    initGalleryReveal()
+    document.addEventListener('astro:page-load', initGalleryReveal)
   })()
 </script>
 
