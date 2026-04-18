@@ -4,7 +4,8 @@ import Page from '@/layouts/Page.astro'
 import Breadcrumb from '@/components/Breadcrumb.astro'
 import PhotoGrid from '@/components/PhotoGrid.astro'
 import PhotoLightbox from '@/components/PhotoLightbox.astro'
-import { ogImageUrl } from '@/lib/image'
+import { imageUrl, ogImageUrl, assetDimensions } from '@/lib/image'
+import { imageGallerySchema, imageObjectSchema, breadcrumbSchema } from '@/lib/jsonld'
 import type { ContentfulAsset } from '@/lib/image'
 
 export async function getStaticPaths() {
@@ -44,9 +45,63 @@ const breadcrumb = [
 ]
 
 const ogImage = ogImageUrl(coverImage)
+const siteUrl = Astro.site?.toString() ?? 'https://lukecartledge.com'
+const pageUrl = new URL(`/photography/${collection.slug as string}`, siteUrl).toString()
+
+const imageObjects = photos.map((photo) => {
+  const dimensions = assetDimensions(photo.image)
+
+  return imageObjectSchema({
+    name: photo.title,
+    contentUrl: imageUrl(photo.image, dimensions.width, 85),
+    description,
+    creator: String(collection.photographer ?? 'Luke Cartledge'),
+    locationCreated: photo.location,
+    width: dimensions.width,
+    height: dimensions.height,
+    exifData: {
+      camera: photo.camera,
+      lens: photo.lens,
+      aperture: photo.aperture,
+      shutterSpeed: photo.shutterSpeed,
+      iso: photo.iso,
+    },
+  })
+})
+
+const galleryObj = imageGallerySchema({
+  name: title,
+  description: description ?? `${title} photography collection`,
+  url: pageUrl,
+  images: imageObjects,
+})
+
+const breadcrumbObj = breadcrumbSchema(
+  breadcrumb.map((item) => ({
+    name: item.label,
+    url: item.href ? new URL(item.href, siteUrl).toString() : undefined,
+  })),
+)
+
+const galleryWithoutContext = Object.fromEntries(
+  Object.entries(galleryObj).filter(([key]) => key !== '@context'),
+)
+const breadcrumbWithoutContext = Object.fromEntries(
+  Object.entries(breadcrumbObj).filter(([key]) => key !== '@context'),
+)
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [galleryWithoutContext, breadcrumbWithoutContext],
+}
 ---
 
-<Page title={`${title} — Photography — Luke Cartledge`} description={description} ogImage={ogImage}>
+<Page
+  title={`${title} — Photography — Luke Cartledge`}
+  description={description}
+  ogImage={ogImage}
+  schema={schema}
+>
   <section class="collection container">
     <Breadcrumb items={breadcrumb} />
 
