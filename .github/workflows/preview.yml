@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Lint (format + eslint)
-        run: prettier --check . && eslint .
+        run: npx prettier --check . && npx eslint .
 
       - name: Lint (types)
         if: github.actor != 'dependabot[bot]'
