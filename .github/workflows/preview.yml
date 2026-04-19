@@ -29,7 +29,7 @@ jobs:
 
       - name: Lint (types)
         if: github.actor != 'dependabot[bot]'
-        run: astro check && tsc --noEmit
+        run: npx astro check && npx tsc --noEmit
         env:
           CONTENTFUL_SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           CONTENTFUL_DELIVERY_TOKEN: ${{ secrets.CONTENTFUL_DELIVERY_TOKEN }}
