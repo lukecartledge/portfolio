@@ -24,19 +24,25 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
+      - name: Lint (format + eslint)
+        run: npx prettier --check . && npx eslint .
+
+      - name: Lint (types)
+        if: github.actor != 'dependabot[bot]'
+        run: npx astro check && npx tsc --noEmit
         env:
           CONTENTFUL_SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           CONTENTFUL_DELIVERY_TOKEN: ${{ secrets.CONTENTFUL_DELIVERY_TOKEN }}
 
       - name: Build
+        if: github.actor != 'dependabot[bot]'
         run: npm run build
         env:
           CONTENTFUL_SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           CONTENTFUL_DELIVERY_TOKEN: ${{ secrets.CONTENTFUL_DELIVERY_TOKEN }}
 
       - name: Deploy preview to CF Pages
+        if: github.actor != 'dependabot[bot]'
         id: deploy
         uses: cloudflare/wrangler-action@v3
         with:
@@ -46,6 +52,7 @@ jobs:
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Comment preview URL on PR
+        if: github.actor != 'dependabot[bot]'
         uses: actions/github-script@v8
         with:
           script: |
