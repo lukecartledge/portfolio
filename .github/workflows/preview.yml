@@ -24,13 +24,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
+      - name: Lint (format + eslint)
+        run: prettier --check . && eslint .
+
+      - name: Lint (types)
+        if: github.actor != 'dependabot[bot]'
+        run: astro check && tsc --noEmit
         env:
           CONTENTFUL_SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
           CONTENTFUL_DELIVERY_TOKEN: ${{ secrets.CONTENTFUL_DELIVERY_TOKEN }}
 
       - name: Build
+        if: github.actor != 'dependabot[bot]'
         run: npm run build
         env:
           CONTENTFUL_SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
