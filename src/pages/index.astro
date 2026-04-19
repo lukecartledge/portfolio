@@ -4,6 +4,7 @@ import Page from '@/layouts/Page.astro'
 import PhotoGrid from '@/components/PhotoGrid.astro'
 import PhotoLightbox from '@/components/PhotoLightbox.astro'
 import { ogImageUrl } from '@/lib/image'
+import { websiteSchema } from '@/lib/jsonld'
 import type { ContentfulAsset } from '@/lib/image'
 
 type PhotoWithExif = {
@@ -66,9 +67,11 @@ const description = seo?.description ?? config.tagline
 const ogImage = heroPhoto?.fields?.image
   ? ogImageUrl(heroPhoto.fields.image as ContentfulAsset)
   : undefined
+const siteUrl = Astro.site?.toString() ?? 'https://lukecartledge.com'
+const schema = websiteSchema(seo?.title ?? String(config.title), siteUrl, String(description))
 ---
 
-<Page title={title} description={description} ogImage={ogImage}>
+<Page title={title} description={description} ogImage={ogImage} schema={schema}>
   <section class="gallery container">
     {photos.length > 0 && <PhotoGrid photos={photos} />}
     <div class="gallery-cta">

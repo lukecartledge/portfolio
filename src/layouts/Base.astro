@@ -8,15 +8,16 @@ interface Props {
   title: string
   description?: string
   ogImage?: string
+  schema?: Record<string, unknown> | Record<string, unknown>[]
 }
 
-const { title, description, ogImage } = Astro.props
+const { title, description, ogImage, schema } = Astro.props
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <Head title={title} description={description} ogImage={ogImage} />
+    <Head title={title} description={description} ogImage={ogImage} schema={schema} />
     <ClientRouter />
   </head>
   <body>
