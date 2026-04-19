@@ -37,6 +37,7 @@ jobs:
           CONTENTFUL_DELIVERY_TOKEN: ${{ secrets.CONTENTFUL_DELIVERY_TOKEN }}
 
       - name: Deploy preview to CF Pages
+        if: github.actor != 'dependabot[bot]'
         id: deploy
         uses: cloudflare/wrangler-action@v3
         with:
@@ -46,6 +47,7 @@ jobs:
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Comment preview URL on PR
+        if: github.actor != 'dependabot[bot]'
         uses: actions/github-script@v8
         with:
           script: |
