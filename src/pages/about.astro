@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content'
 import Page from '@/layouts/Page.astro'
 import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
 import { imageUrl, ogImageUrl, blurPlaceholder, assetDimensions } from '@/lib/image'
+import { personSchema } from '@/lib/jsonld'
 import type { ContentfulAsset } from '@/lib/image'
 
 const siteConfigEntries = await getCollection('siteConfig')
@@ -53,6 +54,20 @@ const socialLinks = Object.entries(rawLinks)
     label: labels[platform] ?? platform,
   }))
 
+const sameAs = [rawLinks.instagram, rawLinks.github].filter(
+  (url): url is string => typeof url === 'string' && url.length > 0,
+)
+
+const siteUrl = Astro.site?.toString() ?? 'https://lukecartledge.com'
+const profileImageUrl = profileImage ? imageUrl(profileImage, 800, 80) : undefined
+const schema = personSchema({
+  name: String(config.title),
+  description: String(description),
+  url: new URL('/about', siteUrl).toString(),
+  image: profileImageUrl,
+  sameAs,
+})
+
 const icons: Record<string, string> = {
   instagram: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`,
   email: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,4 12,13 2,4"/></svg>`,
@@ -60,7 +75,7 @@ const icons: Record<string, string> = {
 }
 ---
 
-<Page title={title} description={description} ogImage={ogImage}>
+<Page title={title} description={description} ogImage={ogImage} schema={schema}>
   {/* Hero — full-width portrait with text overlay */}
   {
     portraitSrc && portraitDims && (

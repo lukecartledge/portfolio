@@ -5,6 +5,7 @@ import CollectionCard from '@/components/CollectionCard.astro'
 import Breadcrumb from '@/components/Breadcrumb.astro'
 import type { ContentfulAsset } from '@/lib/image'
 import { ogImageUrl } from '@/lib/image'
+import { collectionPageSchema } from '@/lib/jsonld'
 
 const allCollections = await getCollection('photoCollections')
 
@@ -29,9 +30,28 @@ const prepared = collections.map((collection) => {
 const breadcrumb = [{ label: 'Home', href: '/' }, { label: 'Photography' }]
 
 const ogImage = prepared[0]?.coverImage ? ogImageUrl(prepared[0].coverImage) : undefined
+const siteUrl = Astro.site?.toString() ?? 'https://lukecartledge.com'
+const pageUrl = new URL('/photography', siteUrl).toString()
+const pageDescription = 'Photography collections by Luke Cartledge'
+const schema = collectionPageSchema({
+  name: 'Photography',
+  url: pageUrl,
+  description: pageDescription,
+  hasPart: prepared.map((item) => ({
+    '@type': 'CollectionPage',
+    name: item.title,
+    url: new URL(`/photography/${item.slug}`, siteUrl).toString(),
+    ...(item.description ? { description: item.description } : {}),
+  })),
+})
 ---
 
-<Page title="Photography — Luke Cartledge" ogImage={ogImage}>
+<Page
+  title="Photography — Luke Cartledge"
+  description="Photography collections by Luke Cartledge"
+  ogImage={ogImage}
+  schema={schema}
+>
   <section class="photography container">
     <Breadcrumb items={breadcrumb} />
 

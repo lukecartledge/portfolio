@@ -9,9 +9,10 @@ interface Props {
   title: string
   description?: string
   ogImage?: string
+  schema?: Record<string, unknown> | Record<string, unknown>[]
 }
 
-const { title, description, ogImage } = Astro.props
+const { title, description, ogImage, schema } = Astro.props
 
 const siteConfigEntries = await getCollection('siteConfig')
 const config = siteConfigEntries[0]?.data
@@ -31,7 +32,7 @@ const socialLinks = Object.entries(rawLinks)
   }))
 ---
 
-<Base title={title} description={description} ogImage={ogImage}>
+<Base title={title} description={description} ogImage={ogImage} schema={schema}>
   <Header socialLinks={socialLinks} />
   <main id="main" transition:animate={fade({ duration: '0.25s' })}>
     <slot />
