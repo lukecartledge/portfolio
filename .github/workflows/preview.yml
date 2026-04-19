@@ -53,7 +53,7 @@ jobs:
 
       - name: Comment preview URL on PR
         if: github.actor != 'dependabot[bot]'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const url = '${{ steps.deploy.outputs.pages-deployment-alias-url }}';
