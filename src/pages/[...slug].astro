@@ -1,0 +1,115 @@
+---
+import { getCollection } from 'astro:content'
+import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
+import Page from '@/layouts/Page.astro'
+import { ogImageUrl } from '@/lib/image'
+import type { ContentfulAsset } from '@/lib/image'
+
+export async function getStaticPaths() {
+  const RESERVED_SLUGS = ['about', 'photography', '404']
+  const allPages = await getCollection('pages')
+
+  return allPages
+    .filter((page) => {
+      const slug = page.data.slug as string
+      if (RESERVED_SLUGS.includes(slug)) {
+        console.warn(`[pages] Skipping page "${slug}" — conflicts with existing route`)
+        return false
+      }
+      return true
+    })
+    .map((page) => ({
+      params: { slug: page.data.slug as string },
+      props: { page: page.data },
+    }))
+}
+
+const { page } = Astro.props
+
+const title = (page.seoMetaTitle as string) ?? (page.title as string)
+const description = (page.seoMetaDescription as string) ?? undefined
+const seoOgImage = page.seoOgImage as ContentfulAsset | undefined
+const ogImage = seoOgImage ? ogImageUrl(seoOgImage) : undefined
+
+const bodyHtml = page.body ? documentToHtmlString(page.body) : ''
+---
+
+<Page title={title} description={description} ogImage={ogImage}>
+  <article class="page-content container">
+    <h1>{page.title}</h1>
+    {bodyHtml && <div class="prose" set:html={bodyHtml} />}
+  </article>
+</Page>
+
+<style>
+  .page-content {
+    padding-block: var(--space-16);
+    max-width: var(--max-prose);
+    margin-inline: auto;
+  }
+
+  .page-content h1 {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    margin-bottom: var(--space-8);
+  }
+
+  .prose :global(p) {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .prose :global(p + p) {
+    margin-top: var(--space-4);
+  }
+
+  .prose :global(h2) {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+
+  .prose :global(h3) {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-6);
+  }
+
+  .prose :global(li) {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text);
+  }
+
+  .prose :global(li + li) {
+    margin-top: var(--space-1);
+  }
+
+  .prose :global(strong) {
+    font-weight: 600;
+  }
+
+  .prose :global(a) {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .prose :global(a:hover) {
+    color: var(--color-text-muted);
+  }
+</style>
