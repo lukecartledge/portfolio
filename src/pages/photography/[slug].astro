@@ -22,6 +22,11 @@ const { collection } = Astro.props
 const title = collection.title as string
 const description = (collection.description as string) ?? undefined
 
+// SEO override fields (Phase 12b)
+const seoMetaTitle = (collection.seoMetaTitle as string) ?? undefined
+const seoMetaDescription = (collection.seoMetaDescription as string) ?? undefined
+const seoOgImage = collection.seoOgImage as ContentfulAsset | undefined
+
 const coverPhotoRef = collection.coverPhoto as { fields: Record<string, unknown> }
 const coverImage = coverPhotoRef.fields.image as ContentfulAsset
 
@@ -44,7 +49,7 @@ const breadcrumb = [
   { label: title },
 ]
 
-const ogImage = ogImageUrl(coverImage)
+const ogImage = seoOgImage ? ogImageUrl(seoOgImage) : ogImageUrl(coverImage)
 const siteUrl = Astro.site?.toString() ?? 'https://lukecartledge.com'
 const pageUrl = new URL(`/photography/${collection.slug as string}`, siteUrl).toString()
 
@@ -97,8 +102,8 @@ const schema = {
 ---
 
 <Page
-  title={`${title} — Photography — Luke Cartledge`}
-  description={description}
+  title={seoMetaTitle ?? `${title} — Photography — Luke Cartledge`}
+  description={seoMetaDescription ?? description}
   ogImage={ogImage}
   schema={schema}
 >
