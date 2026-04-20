@@ -5,9 +5,8 @@ import Page from '@/layouts/Page.astro'
 import { ogImageUrl } from '@/lib/image'
 import type { ContentfulAsset } from '@/lib/image'
 
-const RESERVED_SLUGS = ['about', 'photography', '404']
-
 export async function getStaticPaths() {
+  const RESERVED_SLUGS = ['about', 'photography', '404']
   const allPages = await getCollection('pages')
 
   return allPages
