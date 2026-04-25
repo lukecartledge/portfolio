@@ -1,0 +1,2 @@
+# Redirect deleted photo detail pages to photography index
+/photo/*  /photography  301
