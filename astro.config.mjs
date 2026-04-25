@@ -4,5 +4,13 @@ import sitemap from '@astrojs/sitemap'
 export default defineConfig({
   site: 'https://lukecartledge.com',
   output: 'static',
-  integrations: [sitemap()],
+  trailingSlash: 'never',
+  build: {
+    format: 'file',
+  },
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('sitemap-images'),
+    }),
+  ],
 })
