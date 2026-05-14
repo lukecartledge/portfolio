@@ -52,6 +52,7 @@ const resolvedOgImage = ogImage ?? new URL('/og-default.jpg', Astro.site).toStri
 {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
 
 <link rel="preconnect" href="https://images.ctfassets.net" crossorigin />
+<link rel="preload" href="/fonts/EBGaramond-Italic.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="/fonts/Raleway-Latin.woff2" as="font" type="font/woff2" crossorigin />
 <link
   rel="preload"
