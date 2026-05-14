@@ -22,6 +22,7 @@ updates:
         patterns:
           - 'eslint*'
           - '@eslint/*'
+          - '@typescript-eslint/*'
           - 'prettier*'
           - 'typescript-eslint'
           - 'eslint-*'
@@ -35,3 +36,7 @@ updates:
     labels:
       - dependencies
       - ci
+    groups:
+      github-actions:
+        patterns:
+          - '*'
