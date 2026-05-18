@@ -12,7 +12,10 @@ const {
   ogImage,
   schema,
 } = Astro.props
-const pathname = Astro.url.pathname.replace(/\/$/, '') || '/'
+const pathname = Astro.url.pathname
+  .replace(/\/index\.html$/, '/')
+  .replace(/\.html$/, '')
+  .replace(/\/$/, '') || '/'
 const canonicalUrl = new URL(pathname, Astro.site)
 const resolvedOgImage = ogImage ?? new URL('/og-default.jpg', Astro.site).toString()
 ---
