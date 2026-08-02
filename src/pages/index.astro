@@ -78,7 +78,7 @@ const schema = websiteSchema(seo?.title ?? String(config.title), siteUrl, String
       <a href="/photography" class="cta-link">Browse collections &rarr;</a>
     </div>
   </section>
-  <PhotoLightbox photos={photos} />
+  <PhotoLightbox photos={photos} slot="overlay" />
 </Page>
 
 <style>

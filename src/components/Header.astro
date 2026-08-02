@@ -53,7 +53,14 @@ const navLinks = [
       <ThemeToggle />
     </nav>
 
-    <label class="hamburger" for="mobile-nav-toggle" aria-label="Open menu">
+    <button
+      type="button"
+      class="hamburger"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="mobile-nav-overlay"
+      data-nav-open
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"
@@ -69,7 +76,7 @@ const navLinks = [
         <line x1="3" y1="12" x2="21" y2="12"></line>
         <line x1="3" y1="18" x2="21" y2="18"></line>
       </svg>
-    </label>
+    </button>
   </div>
 </header>
 
@@ -81,10 +88,10 @@ const navLinks = [
   tabindex="-1"
   transition:persist
 />
-<div class="mobile-nav-overlay" aria-hidden="true" transition:persist>
-  <label class="mobile-nav-overlay-bg" for="mobile-nav-toggle"></label>
+<div class="mobile-nav-overlay" id="mobile-nav-overlay" aria-hidden="true" transition:persist>
+  <div class="mobile-nav-overlay-bg" aria-hidden="true" data-nav-close></div>
   <nav class="mobile-nav-panel" aria-label="Mobile navigation">
-    <label class="mobile-nav-close" for="mobile-nav-toggle" aria-label="Close menu">
+    <button type="button" class="mobile-nav-close" aria-label="Close menu" data-nav-close>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"
@@ -99,7 +106,7 @@ const navLinks = [
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
-    </label>
+    </button>
     <div class="mobile-nav-links">
       {
         navLinks.map((link) => (
@@ -132,11 +139,28 @@ const navLinks = [
 
 <script is:inline>
   ;(function () {
-    if (window.__mobileNavCloseInit) return
-    window.__mobileNavCloseInit = true
-    document.addEventListener('astro:before-preparation', function () {
+    if (window.__mobileNavInit) return
+    window.__mobileNavInit = true
+
+    function setOpen(open) {
       const checkbox = document.getElementById('mobile-nav-toggle')
-      if (checkbox) checkbox.checked = false
+      const overlay = document.getElementById('mobile-nav-overlay')
+      const trigger = document.querySelector('.hamburger')
+      if (checkbox) checkbox.checked = open
+      if (overlay) overlay.setAttribute('aria-hidden', open ? 'false' : 'true')
+      if (trigger) trigger.setAttribute('aria-expanded', open ? 'true' : 'false')
+    }
+
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('[data-nav-open]')) {
+        setOpen(true)
+      } else if (e.target.closest('[data-nav-close]')) {
+        setOpen(false)
+      }
+    })
+
+    document.addEventListener('astro:before-preparation', function () {
+      setOpen(false)
     })
   })()
 </script>
@@ -212,6 +236,9 @@ const navLinks = [
     align-items: center;
     cursor: pointer;
     color: var(--color-text);
+    padding: 0;
+    border: none;
+    background: none;
   }
 
   .mobile-nav-overlay {
@@ -250,6 +277,9 @@ const navLinks = [
     cursor: pointer;
     color: var(--color-text);
     display: flex;
+    padding: 0;
+    border: none;
+    background: none;
   }
 
   .mobile-nav-links {

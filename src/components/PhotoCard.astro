@@ -20,7 +20,7 @@ const displayWidth = 600
 const displayHeight = Math.round(displayWidth * (naturalHeight / naturalWidth))
 ---
 
-<figure class="photo-card" data-photo-id={href}>
+<button type="button" class="photo-card" data-photo-id={href} aria-label={`View ${title}`}>
   <img
     src={src}
     srcset={srcset}
@@ -32,10 +32,10 @@ const displayHeight = Math.round(displayWidth * (naturalHeight / naturalWidth))
     decoding="async"
     fetchpriority={fetchpriority}
   />
-  <div class="photo-overlay">
+  <span class="photo-overlay">
     <span class="photo-title">{title}</span>
-  </div>
-</figure>
+  </span>
+</button>
 
 <style>
   .photo-card {
@@ -43,6 +43,13 @@ const displayHeight = Math.round(displayWidth * (naturalHeight / naturalWidth))
     overflow: hidden;
     cursor: pointer;
     line-height: 0;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
   }
 
   .photo-card img {
@@ -67,7 +74,8 @@ const displayHeight = Math.round(displayWidth * (naturalHeight / naturalWidth))
     transition: opacity 200ms ease;
   }
 
-  .photo-card:hover .photo-overlay {
+  .photo-card:hover .photo-overlay,
+  .photo-card:focus-visible .photo-overlay {
     opacity: 1;
   }
 

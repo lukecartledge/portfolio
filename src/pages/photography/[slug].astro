@@ -116,7 +116,7 @@ const schema = {
 
     {photos.length > 0 && <PhotoGrid photos={photos} />}
   </section>
-  <PhotoLightbox photos={photos} />
+  <PhotoLightbox photos={photos} slot="overlay" />
 </Page>
 
 <style>
