@@ -12,6 +12,23 @@
   border-width: 0;
 }
 
+/* Reveal visually-hidden interactive elements (e.g. the skip link) on focus */
+.visually-hidden:focus-visible {
+  position: fixed;
+  top: var(--space-4);
+  left: var(--space-4);
+  z-index: 400;
+  width: auto;
+  height: auto;
+  padding: var(--space-2) var(--space-4);
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
 .container {
   width: 100%;
   max-width: var(--max-content);

@@ -212,6 +212,13 @@ img {
   height: auto;
 }
 
+/* === Focus === */
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
 /* === Font Declarations === */
 
 @font-face {

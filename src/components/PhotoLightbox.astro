@@ -314,6 +314,12 @@ const lightboxData = photos.map((p) => {
       opacity 300ms var(--ease-out);
   }
 
+  /* The global accent outline is invisible against the lightbox backdrop */
+  .lightbox :focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+  }
+
   .lightbox-backdrop {
     position: absolute;
     inset: 0;
