@@ -92,7 +92,8 @@ const schema = websiteSchema(seo?.title ?? String(config.title), siteUrl, String
   .intro-title {
     font-family: var(--font-display);
     font-weight: 400;
-    font-size: var(--text-lg);
+    /* Chosen optically against the gallery; sits between --text-base and --text-lg */
+    font-size: 1.15rem;
     line-height: var(--leading-snug);
     color: var(--color-text-muted);
     max-width: var(--max-prose);
@@ -122,11 +123,5 @@ const schema = websiteSchema(seo?.title ?? String(config.title), siteUrl, String
 
   .cta-link:hover {
     color: var(--color-text);
-  }
-
-  @media (min-width: 768px) {
-    .intro-title {
-      font-size: var(--text-xl);
-    }
   }
 </style>
