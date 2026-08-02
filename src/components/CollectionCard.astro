@@ -17,7 +17,7 @@ const srcset = masonrySrcset(coverImage)
 const { width, height } = assetDimensions(coverImage)
 ---
 
-<a class="collection-card" href={`/photography/${slug}`} aria-label={title}>
+<a class="collection-card" href={`/photography/${slug}`}>
   <div class="collection-card-media">
     <img
       src={src}
@@ -31,7 +31,7 @@ const { width, height } = assetDimensions(coverImage)
       class="collection-card-img"
     />
     <div class="collection-card-overlay">
-      <span class="collection-card-title">{title}</span>
+      <h2 class="collection-card-title">{title}</h2>
     </div>
   </div>
 </a>
@@ -65,21 +65,31 @@ const { width, height } = assetDimensions(coverImage)
   .collection-card-overlay {
     position: absolute;
     inset: 0;
-    background: var(--overlay-gradient);
     display: flex;
     align-items: flex-end;
     padding: var(--space-4);
-    opacity: 0;
+  }
+
+  /* Scrim sits behind the title, so intensifying it never fades the text */
+  .collection-card-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--overlay-gradient-persistent);
+    opacity: 0.85;
     transition: opacity var(--duration-normal) var(--ease-out);
   }
 
-  .collection-card:hover .collection-card-overlay {
+  .collection-card:hover .collection-card-overlay::before,
+  .collection-card:focus-visible .collection-card-overlay::before {
     opacity: 1;
   }
 
   .collection-card-title {
+    position: relative;
     font-family: var(--font-body);
     font-size: var(--text-base);
+    font-weight: 400;
     color: #ffffff;
     letter-spacing: 0.02em;
     line-height: var(--leading-snug);
