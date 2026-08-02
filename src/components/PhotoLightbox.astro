@@ -115,11 +115,32 @@ const lightboxData = photos.map((p) => {
     window.__lightboxInit = true
 
     let currentIndex = -1
+    let lastFocused = null
     const LIGHTBOX_SIZES_ATTR =
       '(max-aspect-ratio: 3/4) min(90vw, calc(80vh * 0.75)), min(90vw, calc(80vh * 1.5))'
+    const BACKGROUND_SELECTOR = '.header, #main, .footer'
 
     function getData() {
       return window.__lightboxData || []
+    }
+
+    function setBackgroundInert(inert) {
+      document.querySelectorAll(BACKGROUND_SELECTOR).forEach(function (el) {
+        if (inert) {
+          el.setAttribute('inert', '')
+        } else {
+          el.removeAttribute('inert')
+        }
+      })
+    }
+
+    // Rendered controls only — .lightbox-nav is display:none below 640px
+    function getFocusable() {
+      const lightbox = document.getElementById('lightbox')
+      if (!lightbox) return []
+      return Array.from(lightbox.querySelectorAll('button:not([disabled])')).filter(function (el) {
+        return el.getClientRects().length > 0
+      })
     }
 
     function preloadAdjacentImages(index) {
@@ -142,6 +163,8 @@ const lightboxData = photos.map((p) => {
     function openLightbox(index) {
       const data = getData()
       if (index < 0 || index >= data.length) return
+      // Distinguish a fresh open from prev/next navigation, which reuses this
+      const wasClosed = currentIndex === -1
       currentIndex = index
       const photo = data[currentIndex]
 
@@ -180,12 +203,27 @@ const lightboxData = photos.map((p) => {
       lightboxCaptionLocation.style.display = photo.location ? '' : 'none'
       lightboxCaptionExif.textContent = photo.exif
       lightboxCaptionExif.style.display = photo.exif ? '' : 'none'
+
+      if (wasClosed) {
+        lastFocused = document.activeElement
+        setBackgroundInert(true)
+      }
+
       lightbox.classList.add('is-open')
       lightbox.setAttribute('aria-hidden', 'false')
       document.body.style.overflow = 'hidden'
       document.body.classList.add('lightbox-active')
       const header = document.querySelector('.header')
       if (header) header.style.visibility = 'hidden'
+
+      if (wasClosed) {
+        // Wait for the visibility change to apply before focusing
+        requestAnimationFrame(function () {
+          const closeBtn = lightbox.querySelector('.lightbox-close')
+          if (closeBtn) closeBtn.focus()
+        })
+      }
+
       preloadAdjacentImages(index)
     }
 
@@ -202,6 +240,13 @@ const lightboxData = photos.map((p) => {
       document.querySelectorAll('link[data-lightbox-preload]').forEach(function (el) {
         el.remove()
       })
+
+      // Must clear inert before restoring focus — inert elements reject focus()
+      setBackgroundInert(false)
+      if (lastFocused && typeof lastFocused.focus === 'function') {
+        lastFocused.focus()
+      }
+      lastFocused = null
     }
 
     function showPrev() {
@@ -234,6 +279,27 @@ const lightboxData = photos.map((p) => {
       if (e.key === 'Escape') closeLightbox()
       if (e.key === 'ArrowLeft') showPrev()
       if (e.key === 'ArrowRight') showNext()
+      if (e.key !== 'Tab') return
+
+      const lightbox = document.getElementById('lightbox')
+      const focusable = getFocusable()
+      if (!lightbox || !focusable.length) {
+        e.preventDefault()
+        return
+      }
+
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      const active = document.activeElement
+      const outside = !lightbox.contains(active)
+
+      if (e.shiftKey && (active === first || outside)) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && (active === last || outside)) {
+        e.preventDefault()
+        first.focus()
+      }
     })
 
     // Touch swipe navigation for mobile
