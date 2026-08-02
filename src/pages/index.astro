@@ -93,9 +93,9 @@ const schema = websiteSchema(seo?.title ?? String(config.title), siteUrl, String
     font-family: var(--font-display);
     font-style: italic;
     font-weight: 500;
-    font-size: var(--text-xl);
+    font-size: var(--text-lg);
     line-height: var(--leading-snug);
-    color: var(--color-text-soft);
+    color: var(--color-text-muted);
     max-width: var(--max-prose);
     margin-inline: auto;
     text-align: center;
@@ -127,7 +127,7 @@ const schema = websiteSchema(seo?.title ?? String(config.title), siteUrl, String
 
   @media (min-width: 768px) {
     .intro-title {
-      font-size: var(--text-2xl);
+      font-size: var(--text-xl);
     }
   }
 </style>
