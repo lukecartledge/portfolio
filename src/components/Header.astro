@@ -187,13 +187,15 @@ const navLinks = [
   }
 
   .site-name {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: var(--text-lg);
-    font-weight: 700;
+    font-family: var(--font-sans);
+    font-size: var(--text-wordmark);
+    font-weight: var(--weight-regular);
     color: var(--color-text-soft);
     text-decoration: none;
-    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    letter-spacing: var(--track-wordmark);
+    /* Tracking also pads the last letter; pull it back so the box ends at the ink */
+    margin-right: calc(-1 * var(--track-wordmark));
   }
 
   .site-name:hover {
