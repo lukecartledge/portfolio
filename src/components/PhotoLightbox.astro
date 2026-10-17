@@ -478,22 +478,22 @@ const lightboxData = photos.map((p) => {
   }
 
   .lightbox-caption-title {
-    font-family: var(--font-body);
+    font-family: var(--font-sans);
     font-size: var(--text-sm);
     color: rgba(255, 255, 255, 0.7);
   }
 
   .lightbox-caption-location {
-    font-family: var(--font-body);
+    font-family: var(--font-sans);
     font-size: var(--text-xs);
     color: rgba(255, 255, 255, 0.45);
   }
 
   .lightbox-caption-exif {
-    font-family: var(--font-body);
+    font-family: var(--font-sans);
     font-size: var(--text-xs);
     color: rgba(255, 255, 255, 0.35);
-    letter-spacing: 0.02em;
+    letter-spacing: var(--track-caption);
   }
 
   @media (max-width: 639px) {
