@@ -14,21 +14,21 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
-    "@contentful/rich-text-html-renderer": "^17.1.6",
+    "@contentful/rich-text-html-renderer": "^17.2.3",
     "@contentful/rich-text-types": "^17.2.5",
-    "astro": "^7.1.1",
-    "contentful": "^11.12.7"
+    "astro": "^7.1.6",
+    "contentful": "^11.12.10"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.9",
+    "@astrojs/check": "^0.9.10",
     "@eslint/js": "^10.0.1",
-    "@typescript-eslint/parser": "^8.60.1",
-    "eslint": "^10.4.1",
+    "@typescript-eslint/parser": "^8.65.0",
+    "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-astro": "^1.7.0",
-    "prettier": "^3.8.3",
+    "eslint-plugin-astro": "^3.0.1",
+    "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.60.1"
+    "typescript-eslint": "^8.65.0"
   }
 }
