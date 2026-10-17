@@ -54,12 +54,13 @@ const visibleRows = rows.filter((row) => row.value !== undefined && row.value !=
   }
 
   .exif-label {
-    font-size: var(--text-xs);
+    font-size: var(--nav-text-size);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: var(--track-label);
     color: var(--color-text-muted);
     line-height: var(--leading-normal);
-    font-weight: 400;
+    font-weight: var(--weight-regular);
+    font-family: var(--font-sans);
   }
 
   .exif-value {
