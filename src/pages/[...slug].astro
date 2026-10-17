@@ -49,10 +49,11 @@ const bodyHtml = page.body ? documentToHtmlString(page.body) : ''
   }
 
   .page-content h1 {
-    font-family: var(--font-heading);
-    font-size: var(--text-3xl);
-    font-weight: 700;
+    font-family: var(--font-sans);
+    font-size: var(--text-title);
+    font-weight: var(--weight-medium);
     margin-bottom: var(--space-8);
+    letter-spacing: var(--track-title);
   }
 
   .prose :global(p) {
@@ -66,19 +67,21 @@ const bodyHtml = page.body ? documentToHtmlString(page.body) : ''
   }
 
   .prose :global(h2) {
-    font-family: var(--font-heading);
-    font-size: var(--text-xl);
-    font-weight: 700;
+    font-family: var(--font-sans);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
     margin-top: var(--space-8);
     margin-bottom: var(--space-3);
+    letter-spacing: -0.005em;
   }
 
   .prose :global(h3) {
-    font-family: var(--font-heading);
+    font-family: var(--font-sans);
     font-size: var(--text-lg);
-    font-weight: 700;
+    font-weight: var(--weight-medium);
     margin-top: var(--space-8);
     margin-bottom: var(--space-3);
+    letter-spacing: -0.005em;
   }
 
   .prose :global(ul),

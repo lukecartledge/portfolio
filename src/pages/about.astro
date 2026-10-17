@@ -207,13 +207,12 @@ const icons: Record<string, string> = {
   }
 
   .about-hero-name {
-    font-family: var(--font-display);
-    font-style: italic;
+    font-family: var(--font-sans);
     font-size: var(--text-3xl);
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     color: #ffffff;
     line-height: var(--leading-tight);
-    letter-spacing: 0.01em;
+    letter-spacing: var(--track-title);
   }
 
   .about-hero-tagline {
@@ -260,9 +259,10 @@ const icons: Record<string, string> = {
   }
 
   .about-name {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-weight: 500;
+    font-family: var(--font-sans);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-title);
+    letter-spacing: var(--track-title);
   }
 
   /* === Sections === */
@@ -277,12 +277,12 @@ const icons: Record<string, string> = {
   }
 
   .section-heading {
-    font-family: var(--font-heading);
-    font-size: var(--text-xl);
-    font-weight: 700;
+    font-family: var(--font-sans);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
     color: var(--color-text);
     margin-bottom: var(--space-6);
-    letter-spacing: 0.01em;
+    letter-spacing: -0.005em;
   }
 
   /* === Prose (shared rich text styles) === */
@@ -297,11 +297,12 @@ const icons: Record<string, string> = {
   }
 
   .prose :global(h3) {
-    font-family: var(--font-heading);
+    font-family: var(--font-sans);
     font-size: var(--text-lg);
-    font-weight: 700;
+    font-weight: var(--weight-medium);
     margin-top: var(--space-8);
     margin-bottom: var(--space-3);
+    letter-spacing: -0.005em;
   }
 
   .prose :global(ul),
