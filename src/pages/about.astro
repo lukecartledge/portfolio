@@ -75,7 +75,13 @@ const icons: Record<string, string> = {
 }
 ---
 
-<Page title={title} description={description} ogImage={ogImage} schema={schema}>
+<Page
+  title={title}
+  description={description}
+  ogImage={ogImage}
+  schema={schema}
+  preloadWeights={['light']}
+>
   {/* Hero — full-width portrait with text overlay */}
   {
     portraitSrc && portraitDims && (

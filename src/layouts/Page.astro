@@ -6,15 +6,17 @@ import Header from '@/components/Header.astro'
 import Footer from '@/components/Footer.astro'
 import { ogImageUrl } from '@/lib/image'
 import type { ContentfulAsset } from '@/lib/image'
+import type { PreloadWeight } from '@/lib/fonts'
 
 interface Props {
   title: string
   description?: string
   ogImage?: string
   schema?: Record<string, unknown> | Record<string, unknown>[]
+  preloadWeights?: PreloadWeight[]
 }
 
-const { title, description, ogImage, schema } = Astro.props
+const { title, description, ogImage, schema, preloadWeights } = Astro.props
 
 const siteConfigEntries = await getCollection('siteConfig')
 const config = siteConfigEntries[0]?.data
@@ -38,7 +40,13 @@ const socialLinks = Object.entries(rawLinks)
   }))
 ---
 
-<Base title={title} description={description} ogImage={resolvedOgImage} schema={schema}>
+<Base
+  title={title}
+  description={description}
+  ogImage={resolvedOgImage}
+  schema={schema}
+  preloadWeights={preloadWeights}
+>
   <Header socialLinks={socialLinks} />
   <main id="main" transition:animate={fade({ duration: '0.25s' })}>
     <slot />

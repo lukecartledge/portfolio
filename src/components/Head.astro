@@ -1,9 +1,13 @@
 ---
+import type { PreloadWeight } from '@/lib/fonts'
+import { preloadFontFiles } from '@/lib/fonts'
+
 interface Props {
   title: string
   description?: string
   ogImage?: string
   schema?: Record<string, unknown> | Record<string, unknown>[]
+  preloadWeights?: PreloadWeight[]
 }
 
 const {
@@ -11,6 +15,7 @@ const {
   description = 'Landscape and travel photography by Luke Cartledge',
   ogImage,
   schema,
+  preloadWeights = [],
 } = Astro.props
 const pathname =
   Astro.url.pathname
@@ -63,3 +68,8 @@ const resolvedOgImage = ogImage ?? new URL('/og-default.jpg', Astro.site).toStri
   type="font/woff2"
   crossorigin
 />
+{
+  preloadFontFiles(preloadWeights).map((href) => (
+    <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />
+  ))
+}

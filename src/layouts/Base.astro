@@ -1,6 +1,7 @@
 ---
 import { ClientRouter } from 'astro:transitions'
 import Head from '@/components/Head.astro'
+import type { PreloadWeight } from '@/lib/fonts'
 import '@/styles/global.css'
 import '@/styles/utilities.css'
 
@@ -9,15 +10,22 @@ interface Props {
   description?: string
   ogImage?: string
   schema?: Record<string, unknown> | Record<string, unknown>[]
+  preloadWeights?: PreloadWeight[]
 }
 
-const { title, description, ogImage, schema } = Astro.props
+const { title, description, ogImage, schema, preloadWeights } = Astro.props
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <Head title={title} description={description} ogImage={ogImage} schema={schema} />
+    <Head
+      title={title}
+      description={description}
+      ogImage={ogImage}
+      schema={schema}
+      preloadWeights={preloadWeights}
+    />
     <ClientRouter />
   </head>
   <body>

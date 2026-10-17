@@ -71,7 +71,13 @@ const siteUrl = Astro.site?.toString() ?? 'https://lukecartledge.com'
 const schema = websiteSchema(seo?.title ?? String(config.title), siteUrl, String(description))
 ---
 
-<Page title={title} description={description} ogImage={ogImage} schema={schema}>
+<Page
+  title={title}
+  description={description}
+  ogImage={ogImage}
+  schema={schema}
+  preloadWeights={['light']}
+>
   <section class="intro container">
     <h1 class="intro-title">{description}</h1>
   </section>
