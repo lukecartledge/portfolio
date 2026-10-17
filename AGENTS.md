@@ -21,7 +21,7 @@ npm run preview   # Preview production build
   - Content loader: `src/content.config.ts` (custom Astro loader using contentful SDK)
 - **Hosting**: Cloudflare Pages (`wrangler.toml`)
 - **Styling**: Vanilla CSS with custom properties. No Tailwind, no CSS-in-JS.
-- **Fonts**: EB Garamond italic (display accent, 400–800 variable), Raleway (headings, 400/700), Poppins (body, 400) — self-hosted woff2 in `public/fonts/`
+- **Fonts**: Poppins only (300 light, 400 regular, 500 medium) — self-hosted latin-subset woff2 in `public/fonts/`. Roles and tokens: see the type system spec.
 
 ## Conventions
 
