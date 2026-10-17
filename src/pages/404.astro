@@ -42,13 +42,14 @@ import Page from '@/layouts/Page.astro'
   }
 
   .not-found-nav a {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    letter-spacing: var(--nav-letter-spacing);
+    font-family: var(--font-sans);
+    font-size: var(--nav-text-size);
+    letter-spacing: var(--track-label);
     text-transform: uppercase;
     text-decoration: none;
     color: var(--color-text-muted);
     transition: color var(--duration-fast) var(--ease-out);
+    font-weight: var(--weight-regular);
   }
 
   .not-found-nav a:hover {
