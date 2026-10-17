@@ -8,7 +8,7 @@ Personal photography portfolio — live at [lukecartledge.com](https://lukecartl
 - **Contentful** — Headless CMS for photography and site content
 - **Cloudflare Pages** — Hosting and CDN
 - **Vanilla CSS** — Custom properties, scoped styles, no frameworks
-- **Fonts** — Raleway (headings), Poppins (body) — self-hosted woff2
+- **Fonts** — Poppins (300 / 400 / 500) — self-hosted latin-subset woff2
 
 ## Getting Started
 
@@ -42,7 +42,7 @@ Copy `.env.example` to `.env` and fill in your Contentful credentials.
 
 ```
 ├── public/
-│   └── fonts/             # Self-hosted Raleway + Poppins
+│   └── fonts/             # Self-hosted Poppins (300 / 400 / 500)
 ├── src/
 │   ├── components/        # Reusable Astro components
 │   ├── content.config.ts  # Astro content collections (custom Contentful loader)
