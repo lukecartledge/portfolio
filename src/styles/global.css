@@ -190,7 +190,9 @@ h6 {
 /* === Base Element Styles === */
 
 body {
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
+  /* Only 300/400/500 ship; never let the browser fake another weight */
+  font-synthesis-weight: none;
   font-size: var(--text-base);
   line-height: var(--leading-normal);
   color: var(--color-text);
@@ -206,9 +208,14 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-heading);
+  font-family: var(--font-sans);
   line-height: var(--leading-snug);
-  font-weight: 700;
+  font-weight: var(--weight-medium);
+}
+
+b,
+strong {
+  font-weight: var(--weight-medium);
 }
 
 h1 {
